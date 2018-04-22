@@ -51,11 +51,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Script\Clickcontrol.cs" />
-     <Compile Include="Assets\Script\MagicCore.cs" />
-     <Compile Include="Assets\Script\mouseevent.cs" />
-     <Compile Include="Assets\Script\Skill.cs" />
-     <Compile Include="Assets\Script\StructNameSp.cs" />
+     <Compile Include="Assets\Scripes\Clickcontrol.cs" />
+     <Compile Include="Assets\Scripes\MagicCore.cs" />
+     <Compile Include="Assets\Scripes\map\MapMain.cs" />
+     <Compile Include="Assets\Scripes\map\UiRender.cs" />
+     <Compile Include="Assets\Scripes\mouseevent.cs" />
+     <Compile Include="Assets\Scripes\Skill.cs" />
+     <Compile Include="Assets\Scripes\StructNameSp.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
