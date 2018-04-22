@@ -4,15 +4,15 @@ using UnityEngine;
 using scriptStructs;
 
 public class MagicCore : MonoBehaviour {
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    // Use this for initialization
+    void Start() {
+
+    }
+
+    // Update is called once per frame
+    void Update() {
+
+    }
 
     public MagicCore()                                    //默认初始化
     {
@@ -42,7 +42,10 @@ public class MagicCore : MonoBehaviour {
     protected int ATK;                //攻击步数
     protected int DEF;                //防御步数
     protected int mPos;               //当前位置
+
     protected int turn;               //当前回合数
+    protected int pointUsedCount;     //当前使用过的节点个数
+    protected int paceCount;          //当前走过的路径数目
 
     protected List<Point> mPoint;     //节点列表
     protected List<Line> mLine;       //边列表
@@ -167,7 +170,7 @@ public class MagicCore : MonoBehaviour {
                             subRoute.Insert(0, locate);
                             break;
                         }
-                    }                      
+                    }
                 }
 
                 //完成后刷新所有技能的状态
@@ -198,6 +201,7 @@ public class MagicCore : MonoBehaviour {
                     //消耗魔力
                     cosumeMagic(skillReady);
                     //清空路径
+                    pointUsedCount += subRoute.Count;
                     subRoute.Clear();
                 }
             }
@@ -210,6 +214,14 @@ public class MagicCore : MonoBehaviour {
         if (cf == ClickFlag.target)       //设定目标完成，释放法术
         {
             skillReady.target = monsterID;
+            //释放技能
+            skillReady.skill.beforeDo(ref skillReady);
+            skillReady.skill.skillDo(ref skillReady);
+            //消耗魔力
+            cosumeMagic(skillReady);
+            //清空路径
+            pointUsedCount += subRoute.Count;
+            subRoute.Clear();
         }
     }
 
@@ -249,9 +261,7 @@ public class MagicCore : MonoBehaviour {
         //依次存入路径
         for (int i = 0; i < DragDoc.Count; i++)
             mRoute.Add(DragDoc[i]);
-
-        //判断技能的可执行性
-
+        paceCount += DragDoc.Count;
     }
 
     public void RclickP(int locate)             //鼠标右击时会发生的事件    
@@ -275,11 +285,12 @@ public class MagicCore : MonoBehaviour {
 
                     ++ATK;
                 }
+                paceCount -= DragDoc.Count;
                 DragDoc.Clear();
             }
             else                                  //清空节点选择
             {
-                if(locate == -1)
+                if (locate == -1)
                 {
                     subRoute.Clear();
                     FreshSkillActivity();
@@ -292,7 +303,7 @@ public class MagicCore : MonoBehaviour {
                 {
                     subRoute.RemoveAt(subRoute.Count - 1);
                 }
-                
+
             }
         }
 
@@ -405,6 +416,16 @@ public class MagicCore : MonoBehaviour {
     public Point getPoint(int pNo)
     {
         return mPoint[pNo];
+    }
+
+    public List<Line> getLine()
+    {
+        return mLine;
+    }
+
+    public Line getLine(int l)
+    {
+        return mLine[l];
     }
 
     public List<Line> getInitLine()
@@ -538,7 +559,7 @@ public class MagicCore : MonoBehaviour {
         Point p = new Point(0, PointColor.white, PointType.normal, 3, new List<int> { 0, 1, 2, 3, 4, 5 });
         r.Add(p);
 
-        p = new Point(1, PointColor.black, PointType.normal, 1, new List<int> { 0, 6, 11, 12, 23});
+        p = new Point(1, PointColor.black, PointType.normal, 1, new List<int> { 0, 6, 11, 12, 23 });
         r.Add(p);
 
         p = new Point(2, PointColor.black, PointType.normal, 1, new List<int> { 1, 6, 7, 13, 14 });
@@ -583,7 +604,7 @@ public class MagicCore : MonoBehaviour {
         p = new Point(15, PointColor.black, PointType.normal, 0, new List<int> { 28, 29, 38 });
         r.Add(p);
 
-        p = new Point(16, PointColor.white, PointType.normal, 0, new List<int> { 30, 35});
+        p = new Point(16, PointColor.white, PointType.normal, 0, new List<int> { 30, 35 });
         r.Add(p);
 
         p = new Point(17, PointColor.white, PointType.normal, 0, new List<int> { 31, 32 });
@@ -612,9 +633,9 @@ public class MagicCore : MonoBehaviour {
         return mPoint;
     }
 
-    public List<Line> getLine()
+    public int getPos()
     {
-        return mLine;
+        return mPos;
     }
 
     public int getCurrentPos()
@@ -665,6 +686,42 @@ public class MagicCore : MonoBehaviour {
     public int getMaxDEF()
     {
         return MaxDEF;
+    }
+
+    public int getHP()
+    {
+        return Hp;
+    }
+
+    public int getMaxHP()
+    {
+        return MaxHp;
+    }
+
+    public int getPaceCount()
+    {
+        return paceCount;
+    }
+
+    public int getUsedPCount()
+    {
+        return pointUsedCount;
+    }
+
+    //设置接口
+    public void setATK(int a)
+    {
+        ATK = a;
+    }
+
+    public void setDEF(int d)
+    {
+        DEF = d;
+    }
+
+    public void setHP(int hp)
+    {
+        Hp = hp;
     }
 }
 
