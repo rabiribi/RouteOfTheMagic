@@ -1,0 +1,11 @@
+# .gitignore for unity  project
+Temp/
+Library/
+.vs/
+obj/
+QCAR/
+
+.DS_Store
+*.csproj
+*.sln
+*.userprefs
