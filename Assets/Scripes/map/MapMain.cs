@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace RouteOfTheMagic
 {
@@ -11,6 +12,10 @@ namespace RouteOfTheMagic
     public enum NodeType
     {
         fight = 0,
+        shop,
+        thing,
+        //boss,
+        count
     }
     /// <summary>
     /// 地图上的节点结构体
@@ -20,7 +25,7 @@ namespace RouteOfTheMagic
         /// <summary>
         /// 上层节点通过后才可以点击触发
         /// </summary>
-        public bool fatherIsPass = false;
+        private bool fatherIsPass = false;
         /// <summary>
         /// 场景类型
         /// </summary>
@@ -33,6 +38,23 @@ namespace RouteOfTheMagic
         /// 该节点连接的子节点，队列形式
         /// </summary>
         public List<int> child = new List<int>();
+
+        public ButtonEx button;
+
+        public bool FatherIsPass
+        {
+            get
+            {
+                return fatherIsPass;
+            }
+
+            set
+            {
+                button.fatherIsPass = value;
+                fatherIsPass = value;
+
+            }
+        }
     }
 
     /// <summary>
@@ -42,46 +64,23 @@ namespace RouteOfTheMagic
     {
         //public List<List<MapNode>> map = new List<List<MapNode>>();
         public List<List<MapNode>> map = new List<List<MapNode>>();
-        public UiRender render;
+        public GameObject mapRoot;
+        private UiRender render;
         public int layerCount = 5;
+        public Sprite sprite;
         // Use this for initialization
+       
         void Start()
         {
+            render = mapRoot.GetComponent<UiRender>();
             Init();
-            int length = 500 / layerCount;
-            for (int i = 0; i < map.Count; i++)
-            {
-                Debug.Log("层");
-                for (int j = 0; j < map[i].Count; j++)
-                {
-                    Debug.Log("节点");
-                    int layerXNum = map[i].Count*-50+50;
-                    int layerYNum = 0;
-                    if (i == map.Count - 1)
-                        layerYNum = 0;
-                    else
-                        layerYNum = map[i+1].Count *-50+50;
-
-                    for (int m = 0; m < map[i][j].child.Count; m++)
-                    {
-                        Debug.Log(map[i][j].child[m]);
-                        int num = map[i][j].child[m];
-                        Line li = new Line();
-                        li.x = new Vector2(layerXNum + 100*j, -250+ length*i);
-                        //if(i==map.Count-1)
-                        //li.y = new Vector2(0, -260 + length * (i+1));
-                        //else
-                        li.y = new Vector2(layerYNum + 100 * num, -260 + length * (i + 1));
-                        render.addLine(li);
-
-                    }
-                }
-            }
             
         }
+        //初始化地图
         void Init()
         {
             List<List<bool>> mark = new List<List<bool>>();
+            //建立结点
             for (int i = 0; i < layerCount; i++)
             {
 
@@ -92,12 +91,16 @@ namespace RouteOfTheMagic
                 {
                     MapNode node = new MapNode();
                     node.layer = i;
+                    //node属性设置TODO
+                    NodeType nodeType = (NodeType)Random.Range(0,(int)NodeType.count);
+                    node.nodeType = nodeType;
                     floor.Add(node);
                     floorMark.Add(false);
                 }
                 map.Add(floor);
                 mark.Add(floorMark);
             }
+            //填充结点的子节点
             for (int i = 0; i < layerCount - 1; i++)
             {
                 List<MapNode> floor = map[i];
@@ -205,6 +208,90 @@ namespace RouteOfTheMagic
             {
                 floorTop[i].child.Add(0);
             }
+
+            ///绘制
+            int length = 500 / layerCount;
+            for (int i = 0; i < map.Count; i++)
+            {
+                Debug.Log("层");
+                for (int j = 0; j < map[i].Count; j++)
+                {
+                    Debug.Log("节点");
+                    int layerXNum = map[i].Count * -50 + 50;
+                    int layerYNum = 0;
+                    if (i == map.Count - 1)
+                        layerYNum = 0;
+                    else
+                        layerYNum = map[i + 1].Count * -50 + 50;
+                    MapNode mapNode = map[i][j];
+                    Color color;
+                    if (mapNode.nodeType==NodeType.fight)
+                    {
+                        color = Color.green;
+                    }
+                    else if(mapNode.nodeType == NodeType.shop)
+                        color = Color.blue;
+                    else
+                        color = Color.red;
+
+
+                    ButtonEx button = CreatButton(new Vector2(layerXNum + 100 * j, -250 + length * i), new Vector2(20, 20), sprite, color);
+                    map[i][j].button = button;
+                    
+                    button.onClick.AddListener(delegate ()
+                    {
+                        this.buttonResponse(mapNode);
+                    });
+                    if (i == 0)
+                    {
+                        mapNode.FatherIsPass = true;
+                    }
+                    //Button btn = new Button();
+                    for (int m = 0; m < map[i][j].child.Count; m++)
+                    {
+                        Debug.Log(map[i][j].child[m]);
+                        int num = map[i][j].child[m];
+                        Line li = new Line();
+
+                        li.x = new Vector2(layerXNum + 100 * j, -250 + length * i);
+                        //if(i==map.Count-1)
+                        //li.y = new Vector2(0, -260 + length * (i+1));
+                        //else
+                        li.y = new Vector2(layerYNum + 100 * num, -260 + length * (i + 1));
+                        render.addLine(li);
+
+                    }
+                }
+            }
+
+        }
+        /// <summary>
+        /// 结点点击响应
+        /// </summary>
+        void buttonResponse(MapNode mapNode)
+        {
+            Debug.Log(mapNode.nodeType);
+        }
+        ButtonEx CreatButton(Vector2 pos,Vector2 size, Sprite sprite,Color color= new Color())
+        {
+            GameObject go = new GameObject("node");
+            RectTransform rect = go.AddComponent<RectTransform>();
+            rect.sizeDelta = size;
+            //return go;
+            go.AddComponent<CanvasRenderer>();
+            Image img = go.AddComponent<Image>();
+            //img.color = Color.white;
+            img.color = color;
+            img.fillCenter = true;
+            img.raycastTarget = true;
+            img.sprite = sprite;
+            if (img.sprite != null)
+                img.type = Image.Type.Sliced;
+            ButtonEx button=go.AddComponent<ButtonEx>();
+            go.GetComponent<Selectable>().image = img;
+            go.transform.SetParent(GameObject.Find("Canvas").transform);
+            go.transform.localPosition = pos;
+            return button;
         }
         // Update is called once per frame
         void Update()
