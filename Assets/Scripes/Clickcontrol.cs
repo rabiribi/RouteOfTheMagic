@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using scriptStructs;
+using RouteOfTheMagic;
 
 public class Clickcontrol : MonoBehaviour {
     public MagicCore magic;
@@ -18,11 +18,14 @@ public class Clickcontrol : MonoBehaviour {
 
     public static bool isDrag;
     // Use this for initialization
-    void Start () {
+    void Start () { 
         magic = new MagicCore();
         monster = new Monster();
         isDrag = false;
         instance = node;
+
+        magic.addMonster(monster0.GetComponent<Monster>());
+
         //初始化节点位置
         for(int i=0;i < 6;++i)
         {
@@ -84,7 +87,12 @@ public class Clickcontrol : MonoBehaviour {
     }
     public void startinit()
     {
-        magic.startTurn();
+        if (magic.getFlag() == ClickFlag.defencer)
+            magic.startTurn();
+
+        if (magic.getFlag()==ClickFlag.normal)
+            magic.setFlag(ClickFlag.defencer);
+
     }
 
     public void InitPoint(float radium,float angle)

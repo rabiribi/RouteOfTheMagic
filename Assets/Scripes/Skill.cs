@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using scriptStructs;
+using RouteOfTheMagic;
 
 public class SkillTool {
-    MagicCore magicCore;
+    public MagicCore magicCore;
     // Use this for initialization
     void Start() {
 
@@ -25,6 +25,7 @@ public class SkillTool {
         skillList.Add(s);
 
         s = new Skill(1, SkillName.魔法飞弹, new List<PointColor> { PointColor.white, PointColor.white }, new List<int> { 0, 0 }, SkillType.singleE, SkillDoType.oneWay, 1.5f, 0);
+        s.skillDo += doDamage;
         skillList.Add(s);
 
         s = new Skill(2, SkillName.火球术, new List<PointColor> { PointColor.red, PointColor.white }, new List<int> { 1, 1 }, SkillType.singleE, SkillDoType.oneWay, 2.5f, 0);
@@ -116,7 +117,24 @@ public class SkillTool {
         return skillList[id];
     }
 
-   
+    void doDamage(ref Magic magic)
+    {
+        List<Point> point = magicCore.getPoint();
+        List<Move> route = magicCore.getRoute();
+        //统计伤害值
+        int pStart = magic.magicRoute[0];
+        int pEnd = magic.magicRoute[1];
+
+        float atk = 0;
+        for (int i = pStart; i <= pEnd; ++i)
+        {
+            atk += point[route[i].pEnd].magic;
+        }
+
+        atk = atk * magic.skill.power + magic.skill.basic;
+
+        magicCore.doAttackToMonster(magic.target, 1, (int)atk);
+    }
 }
 
 class BuffTool

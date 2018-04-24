@@ -66,7 +66,7 @@ namespace RouteOfTheMagic
                     {
                         Debug.Log(map[i][j].child[m]);
                         int num = map[i][j].child[m];
-                        Line li = new Line();
+                        mapLine li = new mapLine();
                         li.x = new Vector2(layerXNum + 100*j, -250+ length*i);
                         //if(i==map.Count-1)
                         //li.y = new Vector2(0, -260 + length * (i+1));

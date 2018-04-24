@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using scriptStructs;
+using RouteOfTheMagic;
 
 public class mouseevent : MonoBehaviour {
     // Use this for initialization

@@ -11,7 +11,7 @@ namespace RouteOfTheMagic
         public int monsterHP;
         public int maxMonsterHP;
         public int attackValue;
-        public List<buff> buffList;
+        public List<buff> buffList = new List<buff>();
 
         [HideInInspector]
         public int[] attackLine;
@@ -356,10 +356,10 @@ namespace RouteOfTheMagic
         /// </summary>
         /// <param name="tempAttackValue">Temp attack value.</param>
         /// <param name="basicAttackLine">Attack line.</param>
-        public List<int> attackDeclaration(int tempAttackValue,int[] basicAttackLine)
+        public List<int> attackDeclaration()
         {
             List<int> tempValue = new List<int>();
-            tempAttackValue = attackValue;
+            int tempAttackValue = attackValue;
             for (int i = 0; i < buffList.Count; i++)
             {
                 //Add attack buff

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace RouteOfTheMagic
 {
-    public struct Line
+    public struct mapLine
     {
         public Vector2 x;
         public Vector2 y;
@@ -27,12 +27,12 @@ namespace RouteOfTheMagic
         {
 
         }
-        List<Line> line = new List<Line>();
+        List<mapLine> line = new List<mapLine>();
         /// <summary>
         /// 增加绘制的线
         /// </summary>
         /// <param name="line">line结构体，线的两端，注意位置是像素位置</param>
-        public void addLine(Line line)
+        public void addLine(mapLine line)
         {
             this.line.Add(line);
         }

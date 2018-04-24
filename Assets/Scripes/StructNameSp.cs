@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace scriptStructs
+namespace RouteOfTheMagic
 {
     /// <summary>
     /// 节点颜色

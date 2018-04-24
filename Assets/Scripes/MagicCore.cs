@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using scriptStructs;
+using RouteOfTheMagic;
 
 public class MagicCore : MonoBehaviour {
     // Use this for initialization
@@ -22,7 +22,9 @@ public class MagicCore : MonoBehaviour {
         DragDoc = new List<Move>();
 
         skillTool = new SkillTool();
+        skillTool.magicCore = this;
         mSkill = skillTool.getInitSkills();
+        mMonster = new List<Monster>();
 
         MaxHp = 100;
         MaxATK = 3;
@@ -54,6 +56,7 @@ public class MagicCore : MonoBehaviour {
     protected List<Point> mPoint;     //节点列表
     protected List<Line> mLine;       //边列表
     protected List<Skill> mSkill;     //技能列表
+    protected List<Monster> mMonster; //怪物列表
 
     protected List<Move> mRoute;       //本回合已经走过的路径
 
@@ -120,18 +123,11 @@ public class MagicCore : MonoBehaviour {
             int subRstart = -1;
             int subRend = -1;
 
-
-            foreach (PointColor p in require)
-            {
-                Debug.Log(p);
-            }
-
             //找到开始节点
             for (int i = 0; i < mRoute.Count; ++i)
             {
                 if (subRstart != -1)
                     break;
-                Debug.Log(require.Count);
                 if (mPoint[mRoute[i].pEnd].color == require[0])
                 {
                     subRstart = i;
@@ -140,7 +136,7 @@ public class MagicCore : MonoBehaviour {
             }
             if (subRstart != -1)    //如果找到，才继续
             {
-                
+
                 //依次判断中间节点
                 for (int i = subRstart; i < mRoute.Count; ++i)
                 {
@@ -370,8 +366,16 @@ public class MagicCore : MonoBehaviour {
         int RStart = m.magicRoute[0];
         int REnd = m.magicRoute[1];
         int isPos = m.magicRoute[2];
-        List<PointColor> pc = m.skill.mRequire;
-        List<int> pr = m.skill.mRequireP;
+        List<PointColor> pc = new List<PointColor>();
+        foreach (PointColor c in m.skill.mRequire)
+        {
+            pc.Add(c);
+        }
+        List<int> pr = new List<int>();
+        foreach (int c in m.skill.mRequireP)
+        {
+            pr.Add(c);
+        }
         int pcID = 0;
 
         //恢复魔力
@@ -394,6 +398,7 @@ public class MagicCore : MonoBehaviour {
             mPoint[mRoute[REnd].pEnd].magic -= 1;
             pc.RemoveAt(pc.Count - 1);
             pr.RemoveAt(pr.Count - 1);
+            
 
             mPoint[mRoute[RStart].pEnd].magic -= pr[0];
             mPoint[mRoute[RStart].pEnd].magic -= 1;
@@ -486,6 +491,12 @@ public class MagicCore : MonoBehaviour {
                 }
             }
         }
+
+        //更新mRoute
+        for (int i = 0; i <= REnd; ++i)
+        {
+            mRoute.RemoveAt(0);
+        }
     }
 
     void recoverMagic(int id)
@@ -502,19 +513,41 @@ public class MagicCore : MonoBehaviour {
         //执行回复魔力事件
     }
 
+    void detectPointBroken()
+    {
+        foreach (Point p in mPoint)
+        {
+            if (p.magic < -1)
+            {
+                p.isBroken = true;
+            }
+        }
+    }
+
+    public void doAttackToMonster(int monsterID, int count, int damage)
+    {
+        for (int i = 0; i < count; ++i)
+        {
+            mMonster[monsterID].getDamage(damage);
+        }
+    }
+
     //操作接口
     public void LclickP(int locate)             //左键点击节点时会发生的事件
     {
+        Debug.Log("姜峰背锅");
         if (cf == ClickFlag.normal)          //如果当前指令是通常状态
         {
             if (mPoint[locate].isActivity == true) //如果当前节点是激活状态
             {
-                //恢复魔力
-                mPoint[locate].magic += 1;
-                mPoint[locate].isActivity = false;
-
-                //完成后刷新所有技能的状态
-                FreshSkillActivity();
+                //在mRoute里搜索
+                while (mRoute[0].pEnd != locate)
+                {
+                    recoverMagic(mRoute[0].pEnd);
+                    mRoute.RemoveAt(0);
+                }
+                recoverMagic(mRoute[0].pEnd);
+                mRoute.RemoveAt(0);
             }
         }
     }
@@ -529,7 +562,7 @@ public class MagicCore : MonoBehaviour {
 
 
                 skillReady.skill = s;               //保存准备释放的技能对象
-                skillReady.magicRoute = getSuitRoute(s.mRequire,s.skillDoType);   //获取技能的子路径
+                skillReady.magicRoute = getSuitRoute(s.mRequire, s.skillDoType);   //获取技能的子路径
 
                 if (s.skillType != SkillType.allE || s.skillType != SkillType.randomE || s.skillType != SkillType.self)
                 {
@@ -543,6 +576,7 @@ public class MagicCore : MonoBehaviour {
                     //消耗魔力
                     s.useable = false;
                     cosumeMagic(skillReady);
+                    detectPointBroken();
                     //统计变化
                     pointUsedCount += skillReady.magicRoute[1] - skillReady.magicRoute[0] + 1;
                 }
@@ -556,14 +590,17 @@ public class MagicCore : MonoBehaviour {
         if (cf == ClickFlag.target)       //设定目标完成，释放法术
         {
             skillReady.target = monsterID;
-            //消耗魔力
-            cosumeMagic(skillReady);
             //释放技能
             //skillReady.skill.beforeDo(ref skillReady);
-            //skillReady.skill.skillDo(ref skillReady);
+            skillReady.skill.skillDo(ref skillReady);
             skillReady.skill.useable = false;
+            //消耗魔力
+            cosumeMagic(skillReady);
+            detectPointBroken();
             //清空路径
             pointUsedCount += skillReady.magicRoute[1] - skillReady.magicRoute[0] + 1;
+            //改变点击状态
+            cf = ClickFlag.normal;
         }
     }
 
@@ -597,7 +634,7 @@ public class MagicCore : MonoBehaviour {
 
             mPos = locate;
 
-          
+
         }
     }
 
@@ -712,9 +749,12 @@ public class MagicCore : MonoBehaviour {
 
     public void startTurn()
     {
-
+        endTurn();
+        cf = ClickFlag.normal;
+        //回合开始========================================
         ATK = MaxATK;
         DEF = MaxDEF;
+
         //存入初始路径
         Move m;
         m.pStart = mPos;
@@ -729,12 +769,20 @@ public class MagicCore : MonoBehaviour {
             mLine[i] = l;
         }
 
-        mRoute.Clear();
-        DragDoc.Clear();
-
         mRoute.Add(m);
     }
 
+    public void endTurn()
+    {
+        //回复魔力
+        foreach (Move m in mRoute)
+        {
+            recoverMagic(m.pEnd);
+        }
+
+        mRoute.Clear();
+        DragDoc.Clear();
+    }
     //查询接口
 
     public Point getPoint(int pNo)
@@ -1027,6 +1075,11 @@ public class MagicCore : MonoBehaviour {
         return pointUsedCount;
     }
 
+    public bool getPointBroked(int i)
+    {
+        return mPoint[i].isBroken;
+    }
+
     public bool getSkillActivity(int skillID)
     {
         bool r = false;
@@ -1038,6 +1091,11 @@ public class MagicCore : MonoBehaviour {
     public int getSkillCap()
     {
         return mSkill.Count;
+    }
+
+    public ClickFlag getFlag()
+    {
+        return cf;
     }
 
     //设置接口
@@ -1061,6 +1119,15 @@ public class MagicCore : MonoBehaviour {
         DragDoc.Clear();
     }
 
+    public void addMonster(Monster m)
+    {
+        mMonster.Add(m);
+    }
+
+    public void setFlag(ClickFlag c)
+    {
+        cf = c;
+    }
 }
 
 
