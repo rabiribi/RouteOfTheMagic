@@ -108,19 +108,18 @@ public class MagicCore : MonoBehaviour {
     List<int> getSuitRoute(List<PointColor> pc, SkillDoType sdt)
     {
         List<int> subRoute = new List<int>();
-       
-        
+        List<PointColor> require = new List<PointColor>();
+        foreach (PointColor p in pc)
+        {
+            require.Add(p);
+        }
+
         //首先正序判断一次=======================================================================================================
         if (sdt == SkillDoType.oneWay || sdt == SkillDoType.twoWay)
         {
             int subRstart = -1;
             int subRend = -1;
 
-            List<PointColor> require = new List<PointColor>();
-            foreach (PointColor p in pc)
-            {
-                require.Add(p);
-            }
 
             foreach (PointColor p in require)
             {
@@ -132,6 +131,7 @@ public class MagicCore : MonoBehaviour {
             {
                 if (subRstart != -1)
                     break;
+                Debug.Log(require.Count);
                 if (mPoint[mRoute[i].pEnd].color == require[0])
                 {
                     subRstart = i;
@@ -178,7 +178,7 @@ public class MagicCore : MonoBehaviour {
         {
             int subRstart = -1;
             int subRend = -1;
-            List<PointColor> require = pc;
+
             //找到开始节点
             for (int i = 0; i < mRoute.Count; ++i)
             {
@@ -244,7 +244,7 @@ public class MagicCore : MonoBehaviour {
             {
                 int pS = -1;
                 int pE = -1;
-                List<PointColor> require = pc;
+
                 //找头
                 for (int i = 0; i < mRoute.Count; ++i)
                 {
@@ -290,7 +290,7 @@ public class MagicCore : MonoBehaviour {
             {
                 int pS = -1;
                 int pE = -1;
-                List<PointColor> require = pc;
+
                 //找尾
                 for (int i = mRoute.Count - 1; i >= 0; --i)
                 {
@@ -401,17 +401,21 @@ public class MagicCore : MonoBehaviour {
             pr.RemoveAt(0);
 
             //如果不是无序就按顺序释放
+
             if (m.skill.skillDoType != SkillDoType.unorder)
             {
                 pcID = 0;
                 for (int i = RStart + 1; i < REnd; ++i)
                 {
                     mPoint[mRoute[i].pEnd].magic -= 1;
-                    if (mPoint[mRoute[i].pEnd].color == pc[pcID])
-                    {
-                        mPoint[mRoute[i].pEnd].magic -= pr[pcID];
-                        ++pcID;
-                    }
+                    if (pc.Count != 0)
+                        if (mPoint[mRoute[i].pEnd].color == pc[pcID])
+                        {
+                            mPoint[mRoute[i].pEnd].magic -= pr[pcID];
+                            ++pcID;
+                            if (pcID == pc.Count)
+                                break;
+                        }
                 }
             }
             else  //否则随便释放
@@ -421,12 +425,14 @@ public class MagicCore : MonoBehaviour {
                     for (int j = 0; j < pc.Count; ++j)
                     {
                         mPoint[mRoute[i].pEnd].magic -= 1;
-                        if (mPoint[mRoute[i].pEnd].color == pc[j])
-                        {
-                            mPoint[mRoute[i].pEnd].magic -= pr[j];
-                            pc.RemoveAt(j);
-                            pr.RemoveAt(j);
-                        }
+                        if (pc.Count != 0)
+                            if (mPoint[mRoute[i].pEnd].color == pc[j])
+                            {
+                                mPoint[mRoute[i].pEnd].magic -= pr[j];
+                                pc.RemoveAt(j);
+                                pr.RemoveAt(j);
+                                --j;
+                            }
                     }
                 }
             }
@@ -451,11 +457,14 @@ public class MagicCore : MonoBehaviour {
                 for (int i = RStart + 1; i < REnd; ++i)
                 {
                     mPoint[mRoute[i].pEnd].magic -= 1;
-                    if (mPoint[mRoute[i].pEnd].color == pc[pcID])
-                    {
-                        mPoint[mRoute[i].pEnd].magic -= pr[pcID];
-                        ++pcID;
-                    }
+                    if (pc.Count != 0)
+                        if (mPoint[mRoute[i].pEnd].color == pc[pcID])
+                        {
+                            mPoint[mRoute[i].pEnd].magic -= pr[pcID];
+                            ++pcID;
+                            if (pcID == pc.Count)
+                                break;
+                        }
                 }
             }
             else  //否则随便释放
@@ -465,12 +474,14 @@ public class MagicCore : MonoBehaviour {
                     for (int j = 0; j < pc.Count; ++j)
                     {
                         mPoint[mRoute[i].pEnd].magic -= 1;
-                        if (mPoint[mRoute[i].pEnd].color == pc[j])
-                        {
-                            mPoint[mRoute[i].pEnd].magic -= pr[j];
-                            pc.RemoveAt(j);
-                            pr.RemoveAt(j);
-                        }
+                        if (pc.Count != 0)
+                            if (mPoint[mRoute[i].pEnd].color == pc[j])
+                            {
+                                mPoint[mRoute[i].pEnd].magic -= pr[j];
+                                pc.RemoveAt(j);
+                                pr.RemoveAt(j);
+                                --j;
+                            }
                     }
                 }
             }
@@ -530,6 +541,7 @@ public class MagicCore : MonoBehaviour {
                     skillReady.skill.beforeDo(ref skillReady);
                     skillReady.skill.skillDo(ref skillReady);
                     //消耗魔力
+                    s.useable = false;
                     cosumeMagic(skillReady);
                     //统计变化
                     pointUsedCount += skillReady.magicRoute[1] - skillReady.magicRoute[0] + 1;
@@ -547,9 +559,9 @@ public class MagicCore : MonoBehaviour {
             //消耗魔力
             cosumeMagic(skillReady);
             //释放技能
-            skillReady.skill.beforeDo(ref skillReady);
-            skillReady.skill.skillDo(ref skillReady);
-            
+            //skillReady.skill.beforeDo(ref skillReady);
+            //skillReady.skill.skillDo(ref skillReady);
+            skillReady.skill.useable = false;
             //清空路径
             pointUsedCount += skillReady.magicRoute[1] - skillReady.magicRoute[0] + 1;
         }
@@ -700,26 +712,14 @@ public class MagicCore : MonoBehaviour {
 
     public void startTurn()
     {
+
         ATK = MaxATK;
         DEF = MaxDEF;
-
         //存入初始路径
         Move m;
         m.pStart = mPos;
         m.pEnd = mPos;
         m.moveLine = -1;
-
-        for (int i = 0; i < mPoint.Count; ++i)
-        {
-            Point p = mPoint[i];
-            if (p.isActivity)
-            {
-                p.isActivity = false;
-                if (p.magic < p.MaxMagic)
-                    ++p.magic;
-            }
-            mPoint[i] = p;
-        }
 
         for (int i = 0; i < mLine.Count; ++i)
         {
