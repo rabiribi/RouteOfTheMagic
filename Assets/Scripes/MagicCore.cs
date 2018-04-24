@@ -20,7 +20,9 @@ public class MagicCore : MonoBehaviour {
         mPoint = getInitPoint();
         mRoute = new List<Move>();
         DragDoc = new List<Move>();
-        subRoute = new List<int>();
+
+        skillTool = new SkillTool();
+        mSkill = skillTool.getInitSkills();
 
         MaxHp = 100;
         MaxATK = 3;
@@ -47,6 +49,8 @@ public class MagicCore : MonoBehaviour {
     protected int pointUsedCount;     //当前使用过的节点个数
     protected int paceCount;          //当前走过的路径数目
 
+    protected SkillTool skillTool = new SkillTool();    //技能工具
+
     protected List<Point> mPoint;     //节点列表
     protected List<Line> mLine;       //边列表
     protected List<Skill> mSkill;     //技能列表
@@ -54,7 +58,6 @@ public class MagicCore : MonoBehaviour {
     protected List<Move> mRoute;       //本回合已经走过的路径
 
     protected Magic skillReady;        //准备释放的技能
-    protected List<int> subRoute;     //进入技能队列的节点
 
     //触发器状态
     ClickFlag cf;           //当前点击一个节点会发生什么
@@ -89,56 +92,403 @@ public class MagicCore : MonoBehaviour {
         {
             Skill s = mSkill[i];
             List<PointColor> pc = s.mRequire;
-            //正序
-            if (pc[0] == mPoint[subRoute[0]].color && pc[pc.Count - 1] == mPoint[subRoute[subRoute.Count - 1]].color) //满足开头和节点要求
+
+            if (getSuitRoute(pc, s.skillDoType).Count != 0)
             {
-                if (pc.Count > 2)
+                s.useable = true;
+            }
+            else
+            {
+                s.useable = false;
+            }
+
+        }
+    }
+
+    List<int> getSuitRoute(List<PointColor> pc, SkillDoType sdt)
+    {
+        List<int> subRoute = new List<int>();
+       
+        
+        //首先正序判断一次=======================================================================================================
+        if (sdt == SkillDoType.oneWay || sdt == SkillDoType.twoWay)
+        {
+            int subRstart = -1;
+            int subRend = -1;
+
+            List<PointColor> require = new List<PointColor>();
+            foreach (PointColor p in pc)
+            {
+                require.Add(p);
+            }
+
+            foreach (PointColor p in require)
+            {
+                Debug.Log(p);
+            }
+
+            //找到开始节点
+            for (int i = 0; i < mRoute.Count; ++i)
+            {
+                if (subRstart != -1)
+                    break;
+                if (mPoint[mRoute[i].pEnd].color == require[0])
                 {
-                    //顺序搜索中间点
-                    int pRoute = 1;
-                    bool isActivity = true;
-                    for (int cNo = 1; cNo < pc.Count - 1; ++cNo)
+                    subRstart = i;
+                    require.RemoveAt(0);
+                }
+            }
+            if (subRstart != -1)    //如果找到，才继续
+            {
+                
+                //依次判断中间节点
+                for (int i = subRstart; i < mRoute.Count; ++i)
+                {
+                    if (require.Count == 1) //如果所有中间节点已经处理完毕
+                        break;
+                    if (mPoint[mRoute[i].pEnd].color == require[0])
                     {
-                        if (pRoute == subRoute.Count) //如果搜索完所有节点
+                        subRstart = i;
+                        require.RemoveAt(0);
+                    }
+                }
+                if (require.Count == 1)  //如果中间点都满足，才继续
+                {
+                    //判断终点
+                    for (int i = subRstart + 1; i < mRoute.Count; ++i)
+                    {
+                        if (mPoint[mRoute[i].pEnd].color == require[0])
                         {
-                            isActivity = false;
-                        }
-                        if (pc[cNo] == mPoint[subRoute[pRoute]].color) //如果匹配的话
-                        {
-                            ++cNo;
-                            ++pRoute;
+                            subRend = i;
                         }
                     }
-                    s.useable = isActivity;
+                    if (subRend != -1)   //找到才添加
+                    {
+                        //添加
+                        subRoute.Add(subRstart);
+                        subRoute.Add(subRend);
+                        subRoute.Add(0);
+                    }
+                }
+            }
+        }
+
+        //给可以倒叙的一次机会判断下倒叙=======================================================================================================
+        if (sdt == SkillDoType.twoWay)
+        {
+            int subRstart = -1;
+            int subRend = -1;
+            List<PointColor> require = pc;
+            //找到开始节点
+            for (int i = 0; i < mRoute.Count; ++i)
+            {
+                if (subRstart != -1)
+                    break;
+                if (mPoint[mRoute[i].pEnd].color == require[require.Count - 1])
+                {
+                    subRstart = i;
+                    require.RemoveAt(require.Count - 1);
+                }
+            }
+            if (subRstart == -1)    //如果没找到，就直接退出
+            {
+                return subRoute;
+            }
+
+            //依次判断中间节点
+            for (int i = subRstart; i < mRoute.Count; ++i)
+            {
+                if (require.Count == 1) //如果所有中间节点已经处理完毕
+                    break;
+                if (mPoint[mRoute[i].pEnd].color == require[require.Count - 1])
+                {
+                    subRstart = i;
+                    require.RemoveAt(require.Count - 1);
+                }
+            }
+            if (require.Count > 1)
+            {
+                return subRoute;   //如果遍历完了还是无法满足中间节点的要求，退出
+            }
+
+            //判断终点
+            for (int i = subRstart + 1; i < mRoute.Count; ++i)
+            {
+                if (mPoint[mRoute[i].pEnd].color == require[require.Count - 1])
+                {
+                    subRend = i;
+                }
+            }
+            if (subRend == -1) //如果终点判定不通过，退出
+            {
+                return subRoute;
+            }
+
+            //判断是否要添加
+            if (subRoute.Count == 2 && subRend - subRstart > subRoute[1] - subRoute[0])
+            {
+                subRoute.Clear();
+                subRoute.Add(subRstart);
+                subRoute.Add(subRend);
+                subRoute.Add(1);
+            }
+        }
+        //如果要求无序的话===================================================================================
+        if (sdt == SkillDoType.unorder)
+        {
+            int uoS = -1;
+            int uoE = -1;
+            int isPos = -1;
+
+            //正着找
+            {
+                int pS = -1;
+                int pE = -1;
+                List<PointColor> require = pc;
+                //找头
+                for (int i = 0; i < mRoute.Count; ++i)
+                {
+                    for (int j = 0; j < require.Count; ++j)
+                        if (mPoint[mRoute[i].pEnd].color == require[j])
+                        {
+                            require.RemoveAt(j);
+                            pS = i;
+                        }
+                }
+                //找尾
+                for (int i = mRoute.Count - 1; i >= 0; --i)
+                {
+                    for (int j = 0; j < require.Count; ++j)
+                        if (mPoint[mRoute[i].pEnd].color == require[j])
+                        {
+                            require.RemoveAt(j);
+                            pE = i;
+                        }
+                }
+                if (pS != -1 && pE != -1 && pE >= pS && require.Count > 0) //如果找到了合适的头尾点,并且还需要判断中间点
+                {
+                    //识别中间点
+                    for (int i = pS + 1; i < pE; ++i)
+                    {
+                        for (int j = 0; j < require.Count; ++j)
+                            if (mPoint[mRoute[i].pEnd].color == require[j])
+                            {
+                                require.RemoveAt(j);
+                            }
+                    }
+                    if (require.Count == 0)
+                    {
+                        //完全符合条件
+                        uoS = pS;
+                        uoE = pE;
+                        isPos = 0;
+                    }
+                }
+            }
+
+            //倒着找
+            {
+                int pS = -1;
+                int pE = -1;
+                List<PointColor> require = pc;
+                //找尾
+                for (int i = mRoute.Count - 1; i >= 0; --i)
+                {
+                    for (int j = 0; j < require.Count; ++j)
+                        if (mPoint[mRoute[i].pEnd].color == require[j])
+                        {
+                            require.RemoveAt(j);
+                            pE = i;
+                        }
+                }
+                //找头
+                for (int i = 0; i < mRoute.Count; ++i)
+                {
+                    for (int j = 0; j < require.Count; ++j)
+                        if (mPoint[mRoute[i].pEnd].color == require[j])
+                        {
+                            require.RemoveAt(j);
+                            pS = i;
+                        }
+                }
+                if (pS != -1 && pE != -1 && pE >= pS && require.Count > 0) //如果找到了合适的头尾点,并且还需要判断中间点
+                {
+                    //识别中间点
+                    for (int i = pS + 1; i < pE; ++i)
+                    {
+                        for (int j = 0; j < require.Count; ++j)
+                            if (mPoint[mRoute[i].pEnd].color == require[j])
+                            {
+                                require.RemoveAt(j);
+                            }
+                    }
+                    if (require.Count == 0)                        //完全符合条件
+                    {
+                        if (pE - pS > uoE - uoS)         //并且长度较大
+                        {
+                            uoS = pS;
+                            uoE = pE;
+                            isPos = 1;
+                        }
+                    }
+                }
+            }
+            if (uoE != -1 && uoS != -1)
+            {
+                subRoute.Add(uoS);
+                subRoute.Add(uoE);
+                subRoute.Add(isPos);
+            }
+
+        }
+        if (sdt == SkillDoType.single)
+        {
+            //顺序找第一个点
+            for (int i = 0; i < mRoute.Count; ++i)
+            {
+                if (mPoint[mRoute[i].pEnd].color == pc[0])
+                {
+                    subRoute.Add(i);
+                    subRoute.Add(i);
+                    subRoute.Add(0);
+                    break;
+                }
+            }
+        }
+        if (sdt == SkillDoType.norequire)
+        {
+            subRoute.Add(subRoute.Count - 1);
+            subRoute.Add(subRoute.Count - 1);
+            subRoute.Add(0);
+        }
+
+        return subRoute;
+    }
+
+    void cosumeMagic(Magic m)
+    {
+        int RStart = m.magicRoute[0];
+        int REnd = m.magicRoute[1];
+        int isPos = m.magicRoute[2];
+        List<PointColor> pc = m.skill.mRequire;
+        List<int> pr = m.skill.mRequireP;
+        int pcID = 0;
+
+        //恢复魔力
+        for (int i = 0; i < RStart; ++i)
+        {
+            recoverMagic(mRoute[i].pEnd);
+        }
+
+        //判断方向
+        if (RStart == REnd) //如果只有一个节点
+        {
+            mPoint[mRoute[REnd].pEnd].magic -= pr[pr.Count];
+            mPoint[mRoute[REnd].pEnd].magic -= 1;
+        }
+        //如果是正序
+        if (isPos == 0)
+        {
+            //释放末尾和开头
+            mPoint[mRoute[REnd].pEnd].magic -= pr[pr.Count - 1];
+            mPoint[mRoute[REnd].pEnd].magic -= 1;
+            pc.RemoveAt(pc.Count - 1);
+            pr.RemoveAt(pr.Count - 1);
+
+            mPoint[mRoute[RStart].pEnd].magic -= pr[0];
+            mPoint[mRoute[RStart].pEnd].magic -= 1;
+            pc.RemoveAt(0);
+            pr.RemoveAt(0);
+
+            //如果不是无序就按顺序释放
+            if (m.skill.skillDoType != SkillDoType.unorder)
+            {
+                pcID = 0;
+                for (int i = RStart + 1; i < REnd; ++i)
+                {
+                    mPoint[mRoute[i].pEnd].magic -= 1;
+                    if (mPoint[mRoute[i].pEnd].color == pc[pcID])
+                    {
+                        mPoint[mRoute[i].pEnd].magic -= pr[pcID];
+                        ++pcID;
+                    }
+                }
+            }
+            else  //否则随便释放
+            {
+                for (int i = RStart + 1; i < REnd; ++i)
+                {
+                    for (int j = 0; j < pc.Count; ++j)
+                    {
+                        mPoint[mRoute[i].pEnd].magic -= 1;
+                        if (mPoint[mRoute[i].pEnd].color == pc[j])
+                        {
+                            mPoint[mRoute[i].pEnd].magic -= pr[j];
+                            pc.RemoveAt(j);
+                            pr.RemoveAt(j);
+                        }
+                    }
+                }
+            }
+        }
+        else   //如果是倒序
+        {
+            //释放末尾和开头
+            mPoint[mRoute[REnd].pEnd].magic -= pr[pr.Count - 1];
+            mPoint[mRoute[REnd].pEnd].magic -= 1;
+            pc.RemoveAt(pc.Count - 1);
+            pr.RemoveAt(pr.Count - 1);
+
+            mPoint[mRoute[RStart].pEnd].magic -= pr[0];
+            mPoint[mRoute[RStart].pEnd].magic -= 1;
+            pc.RemoveAt(0);
+            pr.RemoveAt(0);
+
+            //如果不是无序就按顺序释放
+            if (m.skill.skillDoType != SkillDoType.unorder)
+            {
+                pcID = 0;
+                for (int i = RStart + 1; i < REnd; ++i)
+                {
+                    mPoint[mRoute[i].pEnd].magic -= 1;
+                    if (mPoint[mRoute[i].pEnd].color == pc[pcID])
+                    {
+                        mPoint[mRoute[i].pEnd].magic -= pr[pcID];
+                        ++pcID;
+                    }
+                }
+            }
+            else  //否则随便释放
+            {
+                for (int i = RStart + 1; i < REnd; ++i)
+                {
+                    for (int j = 0; j < pc.Count; ++j)
+                    {
+                        mPoint[mRoute[i].pEnd].magic -= 1;
+                        if (mPoint[mRoute[i].pEnd].color == pc[j])
+                        {
+                            mPoint[mRoute[i].pEnd].magic -= pr[j];
+                            pc.RemoveAt(j);
+                            pr.RemoveAt(j);
+                        }
+                    }
                 }
             }
         }
     }
 
-    void cosumeMagic(Magic m)
+    void recoverMagic(int id)
     {
-        //消耗魔力(正序)
-        List<int> sub = m.magicRoute;
-        List<PointColor> pc = m.skill.mRequire;
-        List<int> pr = m.skill.mRequireP;
-        int pcID = 0;
-        for (int i = 0; i < sub.Count; i++)
+        //回复魔力
+        mPoint[id].magic += 1;
+        if (mPoint[id].magic > mPoint[id].MaxMagic)
         {
-            if (!mPoint[sub[i]].isBroken)
-            {
-                mPoint[sub[i]].magic -= 1;
-                mPoint[sub[i]].isActivity = false;
-                if (mPoint[sub[i]].color == pc[pcID])
-                {
-                    mPoint[sub[i]].magic -= pr[pcID];
-                    ++pcID;
-                }
-                if (mPoint[sub[i]].magic < 0)
-                {
-                    mPoint[sub[i]].isBroken = true;
-                }
-            }
+            mPoint[id].magic = mPoint[id].MaxMagic;
         }
+        //取消激活
+        mPoint[id].isActivity = false;
+        //魔力放出伤害
+        //执行回复魔力事件
     }
 
     //操作接口
@@ -148,30 +498,9 @@ public class MagicCore : MonoBehaviour {
         {
             if (mPoint[locate].isActivity == true) //如果当前节点是激活状态
             {
-                if (subRoute.Count == 0)    //如果当前节点为空，则添加节点1
-                {
-                    subRoute.Add(locate);
-                }
-                else                        //判断新节点是否与已有节点构成路径
-                {
-                    int pS = subRoute[0];
-                    int pE = subRoute[subRoute.Count - 1];
-
-                    for (int i = 0; i < mRoute.Count; ++i)
-                    {
-                        Move m = mRoute[i];
-                        if (m.pEnd == locate && locate == pE + 1)    //如果是路径的后一个点
-                        {
-                            subRoute.Add(locate);
-                            break;
-                        }
-                        else if (m.pStart == locate && locate == pS - 1)  //如果是路径内的前一个点
-                        {
-                            subRoute.Insert(0, locate);
-                            break;
-                        }
-                    }
-                }
+                //恢复魔力
+                mPoint[locate].magic += 1;
+                mPoint[locate].isActivity = false;
 
                 //完成后刷新所有技能的状态
                 FreshSkillActivity();
@@ -181,13 +510,15 @@ public class MagicCore : MonoBehaviour {
 
     public void LclickS(int skillNum)           //左键点击技能时会发生的事件
     {
-        if (cf == ClickFlag.normal)
+        if (cf == ClickFlag.normal && skillNum < mSkill.Count)
         {
             Skill s = mSkill[skillNum];
             if (s.useable == true)
             {
-                skillReady.skill = s;      //保存准备释放的技能对象
-                skillReady.magicRoute = subRoute;
+
+
+                skillReady.skill = s;               //保存准备释放的技能对象
+                skillReady.magicRoute = getSuitRoute(s.mRequire,s.skillDoType);   //获取技能的子路径
 
                 if (s.skillType != SkillType.allE || s.skillType != SkillType.randomE || s.skillType != SkillType.self)
                 {
@@ -200,9 +531,8 @@ public class MagicCore : MonoBehaviour {
                     skillReady.skill.skillDo(ref skillReady);
                     //消耗魔力
                     cosumeMagic(skillReady);
-                    //清空路径
-                    pointUsedCount += subRoute.Count;
-                    subRoute.Clear();
+                    //统计变化
+                    pointUsedCount += skillReady.magicRoute[1] - skillReady.magicRoute[0] + 1;
                 }
             }
 
@@ -214,14 +544,14 @@ public class MagicCore : MonoBehaviour {
         if (cf == ClickFlag.target)       //设定目标完成，释放法术
         {
             skillReady.target = monsterID;
+            //消耗魔力
+            cosumeMagic(skillReady);
             //释放技能
             skillReady.skill.beforeDo(ref skillReady);
             skillReady.skill.skillDo(ref skillReady);
-            //消耗魔力
-            cosumeMagic(skillReady);
+            
             //清空路径
-            pointUsedCount += subRoute.Count;
-            subRoute.Clear();
+            pointUsedCount += skillReady.magicRoute[1] - skillReady.magicRoute[0] + 1;
         }
     }
 
@@ -254,6 +584,8 @@ public class MagicCore : MonoBehaviour {
             DragDoc.Add(m);
 
             mPos = locate;
+
+          
         }
     }
 
@@ -262,8 +594,10 @@ public class MagicCore : MonoBehaviour {
         //依次存入路径
         for (int i = 0; i < DragDoc.Count; ++i)
             mRoute.Add(DragDoc[i]);
-        //Debug.Log(mRoute.Count);
+
         paceCount += DragDoc.Count;
+        DragDoc.Clear();
+        FreshSkillActivity();
     }
 
     public void RclickP(int locate)             //鼠标右击时会发生的事件    
@@ -271,45 +605,15 @@ public class MagicCore : MonoBehaviour {
         //按照拖动记录恢复上一部操作
         if (cf == ClickFlag.normal)
         {
-            if (subRoute.Count == 0)            //如果没有选择节点操作
+            while (DragDoc.Count > 0)
             {
-                for (int i = DragDoc.Count - 1; i >= 0; --i)
-                {
-                    Move pMove = DragDoc[i];
+                Move m = DragDoc[DragDoc.Count - 1];
+                mPoint[m.pEnd].isActivity = false;
+                mLine[m.moveLine].isPassed = false;
+                mPos = m.pStart;
 
-                    Point p = mPoint[pMove.pEnd];
-                    p.isActivity = false;
-                    mPoint[pMove.pEnd] = p;
-
-                    Line l = mLine[pMove.moveLine];
-                    l.isPassed = false;
-                    mLine[pMove.moveLine] = l;
-
-                    //从mRoute清除路径
-                    mRoute.RemoveAt(mRoute.Count - 1);
-
-                    ++ATK;
-                    mPos = pMove.pStart;
-                }
-                paceCount -= DragDoc.Count;
-                DragDoc.Clear();
-            }
-            else                                  //清空节点选择
-            {
-                if (locate == -1)
-                {
-                    subRoute.Clear();
-                    FreshSkillActivity();
-                }
-                else if (locate == subRoute[0])
-                {
-                    subRoute.RemoveAt(0);
-                }
-                else if (locate == subRoute[subRoute.Count - 1])
-                {
-                    subRoute.RemoveAt(subRoute.Count - 1);
-                }
-
+                DragDoc.RemoveAt(DragDoc.Count - 1);
+                ++ATK;
             }
         }
 
@@ -386,15 +690,24 @@ public class MagicCore : MonoBehaviour {
 
     public void addLineDefence(int lineID, float def)
     {
-        Line l = mLine[lineID];
-        l.def += def;
-        mLine[lineID] = l;
+        if (lineID != -1)
+        {
+            Line l = mLine[lineID];
+            l.def += def;
+            mLine[lineID] = l;
+        }
     }
 
     public void startTurn()
     {
         ATK = MaxATK;
         DEF = MaxDEF;
+
+        //存入初始路径
+        Move m;
+        m.pStart = mPos;
+        m.pEnd = mPos;
+        m.moveLine = -1;
 
         for (int i = 0; i < mPoint.Count; ++i)
         {
@@ -418,6 +731,8 @@ public class MagicCore : MonoBehaviour {
 
         mRoute.Clear();
         DragDoc.Clear();
+
+        mRoute.Add(m);
     }
 
     //查询接口
@@ -632,11 +947,6 @@ public class MagicCore : MonoBehaviour {
         return mRoute;
     }
 
-    public List<int> getSubRoute()
-    {
-        return subRoute;
-    }
-
     public List<Point> getPoint()
     {
         return mPoint;
@@ -717,6 +1027,19 @@ public class MagicCore : MonoBehaviour {
         return pointUsedCount;
     }
 
+    public bool getSkillActivity(int skillID)
+    {
+        bool r = false;
+        if(skillID < mSkill.Count)
+            r = mSkill[skillID].useable;
+        return r;
+    }
+
+    public int getSkillCap()
+    {
+        return mSkill.Count;
+    }
+
     //设置接口
     public void setATK(int a)
     {
@@ -737,6 +1060,7 @@ public class MagicCore : MonoBehaviour {
     {
         DragDoc.Clear();
     }
+
 }
 
 

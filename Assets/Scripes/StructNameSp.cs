@@ -53,7 +53,17 @@ namespace scriptStructs
         炽热之血 = 10,
         融甲术 = 11,
         count
-    }
+    };
+
+    public enum SkillDoType
+    {
+        oneWay = 0,
+        twoWay = 1,
+        unorder = 2,
+        single = 3,
+        norequire = 4,
+        count
+    };
 
     public enum BuffName
     {
@@ -183,7 +193,7 @@ namespace scriptStructs
     /// </summary>
     public class Skill
     {
-        public Skill(int i,SkillName sm,List<PointColor> lr,List<int> lrp,SkillType st,float p,float b)
+        public Skill(int i,SkillName sm,List<PointColor> lr,List<int> lrp,SkillType st,SkillDoType sdt,float p,float b)
         {
             id = i;
             name = sm;
@@ -192,6 +202,7 @@ namespace scriptStructs
             skillType = st;
             power = p;
             basic = b;
+            skillDoType = sdt;
 
             useable = false;
             usedTime = 0;
@@ -204,6 +215,7 @@ namespace scriptStructs
         public List<PointColor> mRequire;   //释放要求
         public List<int> mRequireP;         //释放要求对应的点数
         public SkillType skillType;         //技能类型
+        public SkillDoType skillDoType;     //技能释放类型
 
         public float power;                 //伤害倍率
         public float basic;                 //基础伤害值

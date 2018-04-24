@@ -7,18 +7,23 @@ using scriptStructs;
 
 public class Clickcontrol : MonoBehaviour {
     public MagicCore magic;
+    public Monster monster;
     public GameObject node;
     public GameObject linePerb;
     public GameObject monster0;
+    public List<GameObject> skillList;
     private GameObject instance;
+    private GameObject btnGameObject;
     private List<GameObject> lineGameObjectlist;
 
     public static bool isDrag;
     // Use this for initialization
     void Start () {
         magic = new MagicCore();
+        monster = new Monster();
         isDrag = false;
         instance = node;
+        //初始化节点位置
         for(int i=0;i < 6;++i)
         {
             InitPoint(3, 120 - i*60);
@@ -36,20 +41,45 @@ public class Clickcontrol : MonoBehaviour {
             InitPoint(9, 150 - i * 120);
         }
         lineGameObjectlist = new List<GameObject>();
+        //初始化连线
         InitLine();
         
     }
 	
 	// Update is called once per frame
 	void Update () {
+        //显示ATK和DEF
         GameObject.Find("ATK").GetComponent<Text>().text = "ATK: "+magic.getATK().ToString();
         GameObject.Find("DEF").GetComponent<Text>().text = "DEF: "+magic.getDEF().ToString();
-
+        //测试monster，获取血量等
+        monster0.GetComponentInChildren<Text>().text = monster0.GetComponent<Monster>().monsterHP.ToString();
+        //绘制连线颜色
         for(int i=0;i<lineGameObjectlist.Count;++i)
         {
             Color temp = toLineColor(magic.getLineState(i));
             lineGameObjectlist[i].GetComponent<LineRenderer>().startColor = temp;
             lineGameObjectlist[i].GetComponent<LineRenderer>().endColor = temp;
+        }
+
+        //设定skill的状态
+        foreach (GameObject sk in skillList)
+        {
+            if (!magic.getSkillActivity(int.Parse(sk.name)))
+            {
+                sk.GetComponent<Button>().interactable = false;
+            }
+            else
+            {
+                sk.GetComponent<Button>().interactable = true;
+            }
+            if (int.Parse(sk.name)+1>magic.getSkillCap())
+            {
+                sk.SetActive(false);
+            }
+            else
+            {
+                sk.SetActive(true);
+            }
         }
     }
     public void startinit()
@@ -92,6 +122,7 @@ public class Clickcontrol : MonoBehaviour {
             }
         }
     }
+    //初始化连线颜色
     public Color toLineColor(lineState lineSt)
     {
         Color lineColor = new Color();
@@ -112,15 +143,17 @@ public class Clickcontrol : MonoBehaviour {
         }
         return lineColor;
     }
+    //点击技能触发
     public void toSkill()
     {
-        GameObject btnGameObject = EventSystem.current.currentSelectedGameObject;
+        btnGameObject = EventSystem.current.currentSelectedGameObject;
         int skillID = int.Parse(btnGameObject.name);
         magic.LclickS(skillID);
     }
+    //点击怪物
     public void toMonster()
     {
-        GameObject btnGameObject = EventSystem.current.currentSelectedGameObject;
+        btnGameObject = EventSystem.current.currentSelectedGameObject;
         int monsterID = int.Parse(btnGameObject.name);
         magic.LclickM(monsterID);
     }
