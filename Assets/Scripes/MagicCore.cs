@@ -209,7 +209,7 @@ public class MagicCore : MonoBehaviour {
         }
     }
 
-    public void LclockM(int monsterID)          //左键点击怪物时会发生的事件
+    public void LclickM(int monsterID)          //左键点击怪物时会发生的事件
     {
         if (cf == ClickFlag.target)       //设定目标完成，释放法术
         {
@@ -236,6 +236,7 @@ public class MagicCore : MonoBehaviour {
             !mPoint[locate].isUnpassable &&       //只有目标节点可以移动才可以通过
             mPoint[locate].MaxMagic != 0)         //只有目标节点已经被点亮才可以通过
         {
+
             --ATK;
 
             Point p = mPoint[locate];
@@ -259,8 +260,9 @@ public class MagicCore : MonoBehaviour {
     public void dragLoose()                     //松开拖动时的事件
     {
         //依次存入路径
-        for (int i = 0; i < DragDoc.Count; i++)
+        for (int i = 0; i < DragDoc.Count; ++i)
             mRoute.Add(DragDoc[i]);
+        //Debug.Log(mRoute.Count);
         paceCount += DragDoc.Count;
     }
 
@@ -271,7 +273,7 @@ public class MagicCore : MonoBehaviour {
         {
             if (subRoute.Count == 0)            //如果没有选择节点操作
             {
-                for (int i = 0; i < DragDoc.Count; ++i)
+                for (int i = DragDoc.Count - 1; i >= 0; --i)
                 {
                     Move pMove = DragDoc[i];
 
@@ -283,7 +285,11 @@ public class MagicCore : MonoBehaviour {
                     l.isPassed = false;
                     mLine[pMove.moveLine] = l;
 
+                    //从mRoute清除路径
+                    mRoute.RemoveAt(mRoute.Count - 1);
+
                     ++ATK;
+                    mPos = pMove.pStart;
                 }
                 paceCount -= DragDoc.Count;
                 DragDoc.Clear();
@@ -409,6 +415,9 @@ public class MagicCore : MonoBehaviour {
             l.def = 0;
             mLine[i] = l;
         }
+
+        mRoute.Clear();
+        DragDoc.Clear();
     }
 
     //查询接口
@@ -660,7 +669,7 @@ public class MagicCore : MonoBehaviour {
             if (DragDoc[i].moveLine == l)
                 ls = lineState.drag;
         }
-        for (int i = 0; i > mRoute.Count; ++i)
+        for (int i = 0; i < mRoute.Count; ++i)
         {
             if (mRoute[i].moveLine == l)
                 ls = lineState.light;
@@ -722,6 +731,11 @@ public class MagicCore : MonoBehaviour {
     public void setHP(int hp)
     {
         Hp = hp;
+    }
+
+    public void clearDragDoc()
+    {
+        DragDoc.Clear();
     }
 }
 

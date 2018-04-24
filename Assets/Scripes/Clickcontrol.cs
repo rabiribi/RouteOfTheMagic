@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using scriptStructs;
 
@@ -8,7 +9,10 @@ public class Clickcontrol : MonoBehaviour {
     public MagicCore magic;
     public GameObject node;
     public GameObject linePerb;
+    public GameObject monster0;
     private GameObject instance;
+    private List<GameObject> lineGameObjectlist;
+
     public static bool isDrag;
     // Use this for initialization
     void Start () {
@@ -31,13 +35,22 @@ public class Clickcontrol : MonoBehaviour {
         {
             InitPoint(9, 150 - i * 120);
         }
+        lineGameObjectlist = new List<GameObject>();
         InitLine();
+        
     }
 	
 	// Update is called once per frame
 	void Update () {
-        // GameObject.Find("ATK").GetComponent<Text>().text=
-        // GameObject.Find("ATK").GetComponent<Text>().text=
+        GameObject.Find("ATK").GetComponent<Text>().text = "ATK: "+magic.getATK().ToString();
+        GameObject.Find("DEF").GetComponent<Text>().text = "DEF: "+magic.getDEF().ToString();
+
+        for(int i=0;i<lineGameObjectlist.Count;++i)
+        {
+            Color temp = toLineColor(magic.getLineState(i));
+            lineGameObjectlist[i].GetComponent<LineRenderer>().startColor = temp;
+            lineGameObjectlist[i].GetComponent<LineRenderer>().endColor = temp;
+        }
     }
     public void startinit()
     {
@@ -75,9 +88,40 @@ public class Clickcontrol : MonoBehaviour {
             linePerb.GetComponent<LineRenderer>().SetPosition(1, pos2);
             if (Plist[p1].MaxMagic!=0 && Plist[p2].MaxMagic != 0)
             {
-                GameObject.Instantiate(linePerb).name = "Line" + l.roateID;
+                lineGameObjectlist.Add(GameObject.Instantiate(linePerb));
             }
         }
     }
-    
+    public Color toLineColor(lineState lineSt)
+    {
+        Color lineColor = new Color();
+        switch (lineSt)
+        {
+            case lineState.drag:
+                lineColor = Color.yellow;
+                break;
+            case lineState.light:
+                lineColor = Color.blue;
+                break;
+            case lineState.normal:
+                lineColor = Color.black;
+                break;
+            case lineState.used:
+                lineColor = Color.red;
+                break;
+        }
+        return lineColor;
+    }
+    public void toSkill()
+    {
+        GameObject btnGameObject = EventSystem.current.currentSelectedGameObject;
+        int skillID = int.Parse(btnGameObject.name);
+        magic.LclickS(skillID);
+    }
+    public void toMonster()
+    {
+        GameObject btnGameObject = EventSystem.current.currentSelectedGameObject;
+        int monsterID = int.Parse(btnGameObject.name);
+        magic.LclickM(monsterID);
+    }
 }

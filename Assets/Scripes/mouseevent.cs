@@ -26,12 +26,9 @@ public class mouseevent : MonoBehaviour {
             this.GetComponentInChildren<TextMesh>().text =
             magic.getPoint(int.Parse(this.tag)).magic + "/" + magic.getPoint(int.Parse(this.tag)).MaxMagic;
         }
-
-        if (pList[int.Parse(this.tag)].isActivity)
-            this.GetComponent<SpriteRenderer>().color = Color.red;
-        else
-            this.GetComponent<SpriteRenderer>().color = Color.white;
-       
+  
+        this.GetComponent<SpriteRenderer>().color = toPointColor(magic.getPointColor(int.Parse(this.tag)));
+        
 
         if (Input.GetMouseButton(1)&&!Clickcontrol.isDrag)
             magic.RclickP(-1);
@@ -56,5 +53,28 @@ public class mouseevent : MonoBehaviour {
     public  MagicCore getCore()
     {
         return magic;
+    }
+    public Color toPointColor(PointColor pointC)
+    {
+        Color color = new Color();
+        switch (pointC)
+        {
+            case PointColor.black:
+                color = Color.black;
+                break;
+            case PointColor.blue:
+                color = Color.blue;
+                break;
+            case PointColor.red:
+                color = Color.red;
+                break;
+            case PointColor.white:
+                color = Color.white;
+                break;
+            case PointColor.yellow:
+                color = Color.yellow;
+                break;
+        }
+        return color;
     }
 }
