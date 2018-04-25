@@ -1258,6 +1258,11 @@ public class MagicCore : MonoBehaviour {
         return r;
     }
 
+    public bool isDefencer(int i)
+    {
+        return mPoint[i].isDefence;
+    }
+
     //设置接口
     public void setATK(int a)
     {

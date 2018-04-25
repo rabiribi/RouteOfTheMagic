@@ -28,6 +28,10 @@ public class mouseevent : MonoBehaviour {
         }
         //节点颜色初始化
         this.GetComponent<SpriteRenderer>().color = toPointColor(magic.getPointColor(int.Parse(this.tag)));
+        if(magic.isDefencer(int.Parse(this.tag)))
+        {
+            this.GetComponent<SpriteRenderer>().color = Color.gray;
+        }
 
         //空白处按右键，取消所有操作
         if (Input.GetMouseButton(1) && Clickcontrol.isDrag)

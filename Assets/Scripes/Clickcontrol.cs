@@ -63,12 +63,11 @@ public class Clickcontrol : MonoBehaviour {
     //初始化
     public void startinit()
     {
-       //背锅
-       // if (magic.getFlag() == ClickFlag.defencer)
+        //if (magic.getFlag() == ClickFlag.defencer)
             magic.startTurn();
 
-       // if (magic.getFlag()==ClickFlag.normal)
-       //     magic.setFlag(ClickFlag.defencer);
+        //if (magic.getFlag() == ClickFlag.normal)
+            //magic.setFlag(ClickFlag.defencer);
 
     }
 
