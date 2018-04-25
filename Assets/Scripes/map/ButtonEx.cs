@@ -1,20 +1,4 @@
-﻿//using System.Collections;
-//using System.Collections.Generic;
-//using UnityEngine;
-
-//public class ButtonEx : MonoBehaviour {
-
-//	// Use this for initialization
-//	void Start () {
-		
-//	}
-	
-//	// Update is called once per frame
-//	void Update () {
-		
-//	}
-//}
-using System.Collections;  
+﻿using System.Collections;  
 using System.Collections.Generic;  
 using UnityEngine;  
 using UnityEngine.UI;  
@@ -247,6 +231,7 @@ public class ButtonEx : UnityEngine.UI.Selectable,
     {
         if (!IsActive())
             return;
+        this.gameObject.GetComponent<RectTransform>().sizeDelta *=3.0f/2;
         m_OnEnter.Invoke();
     }
 
@@ -254,6 +239,7 @@ public class ButtonEx : UnityEngine.UI.Selectable,
     {
         if (!IsActive() || !isEnter)
             return;
+        this.gameObject.GetComponent<RectTransform>().sizeDelta *=2.0f/3;
         m_OnExit.Invoke();
     }
 

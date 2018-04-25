@@ -288,8 +288,12 @@ namespace RouteOfTheMagic
             if (img.sprite != null)
                 img.type = Image.Type.Sliced;
             ButtonEx button=go.AddComponent<ButtonEx>();
+            button.onEnter.AddListener(delegate ()
+            {
+                
+            });
             go.GetComponent<Selectable>().image = img;
-            go.transform.SetParent(GameObject.Find("Canvas").transform);
+            go.transform.SetParent(mapRoot.transform);
             go.transform.localPosition = pos;
             return button;
         }

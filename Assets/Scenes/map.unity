@@ -143,8 +143,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed39e07fac3510248ad2397bc924e4bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  render: {fileID: 989782108}
+  mapRoot: {fileID: 989782106}
   layerCount: 12
+  sprite: {fileID: 21300000, guid: b4deb919f5cc9b444b623c56bdf05ef0, type: 3}
 --- !u!81 &185931013
 AudioListener:
   m_ObjectHideFlags: 0
