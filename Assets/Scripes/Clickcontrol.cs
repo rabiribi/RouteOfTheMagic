@@ -1,56 +1,70 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using scriptStructs;
+using RouteOfTheMagic;
 
 public class Clickcontrol : MonoBehaviour {
+
+    [SerializeField]
+    Sprite mySprite;
+
     public MagicCore magic;
+    public Monster monster;
     public GameObject node;
     public GameObject linePerb;
+    public GameObject monster0;
+    public List<GameObject> skillList;
     private GameObject instance;
+    private GameObject btnGameObject;
     private List<GameObject> lineGameObjectlist;
+
     public static bool isDrag;
     // Use this for initialization
-    void Start () {
+    void Start () { 
         magic = new MagicCore();
+        monster = new Monster();
+        lineGameObjectlist = new List<GameObject>();
         isDrag = false;
         instance = node;
-        for(int i=0;i < 6;++i)
-        {
-            InitPoint(3, 120 - i*60);
-        }
-        for (int i = 0; i < 6; ++i)
-        {
-            InitPoint(3*Mathf.Sqrt(3), 90 - i * 60);
-        }
-        for (int i = 0; i < 3; ++i)
-        {
-            InitPoint(9, 90 - i * 120);
-        }
-        for (int i = 0; i < 3; ++i)
-        {
-            InitPoint(9, 150 - i * 120);
-        }
-        lineGameObjectlist = new List<GameObject>();
+
+        magic.addMonster(monster0.GetComponent<Monster>());
+
+        //初始化节点位置
+        InitPointPos();
+        //初始化连线
         InitLine();
         
     }
 	
 	// Update is called once per frame
 	void Update () {
-        // GameObject.Find("ATK").GetComponent<Text>().text=
-        // GameObject.Find("ATK").GetComponent<Text>().text=
-        for(int i=0;i<lineGameObjectlist.Count;++i)
-        {
-            Color temp = toLineColor(magic.getLineState(i));
-            lineGameObjectlist[i].GetComponent<LineRenderer>().startColor = temp;
-            lineGameObjectlist[i].GetComponent<LineRenderer>().endColor = temp;
-        }
+        //显示ATK和DEF
+        GameObject.Find("ATK").GetComponent<Text>().text = "ATK: "+magic.getATK().ToString();
+        GameObject.Find("DEF").GetComponent<Text>().text = "DEF: "+magic.getDEF().ToString();
+        GameObject.Find("HP").GetComponent<Text>().text = "HP:" + magic.getHP().ToString();
+        //测试monster，获取血量等
+        monster0.GetComponentInChildren<Text>().text = monster0.GetComponent<Monster>().monsterHP.ToString();
+        //绘制连线颜色
+        drawLineColor();
+
+        //设定skill的状态
+        skillStatus();
+
+        //检查节点信息
+        pointStatus();
     }
+    //初始化
     public void startinit()
     {
-        magic.startTurn();
+       //背锅
+       // if (magic.getFlag() == ClickFlag.defencer)
+            magic.startTurn();
+
+       // if (magic.getFlag()==ClickFlag.normal)
+       //     magic.setFlag(ClickFlag.defencer);
+
     }
 
     public void InitPoint(float radium,float angle)
@@ -60,11 +74,31 @@ public class Clickcontrol : MonoBehaviour {
         mPos.x = radium * Mathf.Cos(angle / 180.0f * Mathf.PI);
         mPos.y = radium * Mathf.Sin(angle / 180.0f * Mathf.PI);
         mPos.z = 0;
-       
+        
         //实例化
         instance=GameObject.Instantiate(instance, mPos,Quaternion.identity);
         instance.tag = (int.Parse(instance.tag) + 1).ToString();
         instance.name = "Point" + instance.tag;
+    }
+
+    public void InitPointPos()
+    {
+        for (int i = 0; i < 6; ++i)
+        {
+            InitPoint(3, 120 - i * 60);
+        }
+        for (int i = 0; i < 6; ++i)
+        {
+            InitPoint(3 * Mathf.Sqrt(3), 90 - i * 60);
+        }
+        for (int i = 0; i < 3; ++i)
+        {
+            InitPoint(9, 90 - i * 120);
+        }
+        for (int i = 0; i < 3; ++i)
+        {
+            InitPoint(9, 150 - i * 120);
+        }
     }
 
     public void InitLine()
@@ -88,6 +122,7 @@ public class Clickcontrol : MonoBehaviour {
             }
         }
     }
+    
     public Color toLineColor(lineState lineSt)
     {
         Color lineColor = new Color();
@@ -107,5 +142,66 @@ public class Clickcontrol : MonoBehaviour {
                 break;
         }
         return lineColor;
+    }
+
+    //点击技能触发
+    public void toSkill()
+    {
+        btnGameObject = EventSystem.current.currentSelectedGameObject;
+        int skillID = int.Parse(btnGameObject.name);
+        magic.LclickS(skillID);
+    }
+
+    //点击怪物
+    public void toMonster()
+    {
+        btnGameObject = EventSystem.current.currentSelectedGameObject;
+        int monsterID = int.Parse(btnGameObject.name);
+        magic.LclickM(monsterID);
+    }
+
+    //绘制连线颜色
+    public void drawLineColor()
+    {
+        for (int i = 0; i < lineGameObjectlist.Count; ++i)
+        {
+            Color temp = toLineColor(magic.getLineState(i));
+            lineGameObjectlist[i].GetComponent<LineRenderer>().startColor = temp;
+            lineGameObjectlist[i].GetComponent<LineRenderer>().endColor = temp;
+        }
+    }
+
+    //设定skill的状态
+    public void skillStatus()
+    {
+        foreach (GameObject sk in skillList)
+        {
+            if (!magic.getSkillActivity(int.Parse(sk.name)))
+            {
+                sk.GetComponent<Button>().interactable = false;
+            }
+            else
+            {
+                sk.GetComponent<Button>().interactable = true;
+            }
+            if (int.Parse(sk.name) + 1 > magic.getSkillCap())
+            {
+                sk.SetActive(false);
+            }
+            else
+            {
+                sk.SetActive(true);
+            }
+        }
+    }
+
+    //节点信息
+    public void pointStatus()
+    {
+        for (int i=0;i<19;++i)
+        {
+            if (magic.getPointBroked(i))
+                GameObject.FindGameObjectWithTag(i.ToString()).GetComponent<SpriteRenderer>().sprite = mySprite;
+        }
     }
 }

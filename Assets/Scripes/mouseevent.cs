@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using scriptStructs;
+using RouteOfTheMagic;
 
 public class mouseevent : MonoBehaviour {
     // Use this for initialization
@@ -16,7 +16,7 @@ public class mouseevent : MonoBehaviour {
         magic = GameObject.Find("EventSystem").GetComponent<Clickcontrol>().magic;
         pList = magic.getPoint();
 
-        //判断状态
+        //判断状态,确定节点是否显示，以及其魔力值等
         if (magic.getPoint(int.Parse(this.tag)).MaxMagic == 0)
         {
             this.GetComponent<SpriteRenderer>().sprite=null;
@@ -26,13 +26,17 @@ public class mouseevent : MonoBehaviour {
             this.GetComponentInChildren<TextMesh>().text =
             magic.getPoint(int.Parse(this.tag)).magic + "/" + magic.getPoint(int.Parse(this.tag)).MaxMagic;
         }
-  
+        //节点颜色初始化
         this.GetComponent<SpriteRenderer>().color = toPointColor(magic.getPointColor(int.Parse(this.tag)));
-        
 
-        if (Input.GetMouseButton(1)&&!Clickcontrol.isDrag)
+        //空白处按右键，取消所有操作
+        if (Input.GetMouseButton(1) && Clickcontrol.isDrag)
+        {
             magic.RclickP(-1);
+            Clickcontrol.isDrag = false;
+        }
     }
+    //鼠标悬停事件(基于碰撞体)
     void OnMouseOver()
     {
         if (Clickcontrol.isDrag)
@@ -40,20 +44,24 @@ public class mouseevent : MonoBehaviour {
         if (Input.GetMouseButton(1))
             magic.RclickP(int.Parse(this.tag));
     }
+    //鼠标按下事件(基于碰撞体)
     void OnMouseDown()
     {
         if (magic.getCurrentPos() == int.Parse(this.tag))
             Clickcontrol.isDrag = true;
     }
+    //鼠标抬起事件(基于碰撞体)
     void OnMouseUp()
     {
         Clickcontrol.isDrag = false;
         magic.dragLoose();
     }
+    //接口
     public  MagicCore getCore()
     {
         return magic;
     }
+    //获取颜色信息
     public Color toPointColor(PointColor pointC)
     {
         Color color = new Color();

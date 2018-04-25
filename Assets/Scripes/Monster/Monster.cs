@@ -11,7 +11,7 @@ namespace RouteOfTheMagic
         public int monsterHP;
         public int maxMonsterHP;
         public int attackValue;
-        public List<buff> buffList;
+        public List<buff> buffList = new List<buff>();
 
         [HideInInspector]
         public int[] attackLine;
@@ -141,7 +141,7 @@ namespace RouteOfTheMagic
         /// <param name="currentHP">Current hp.</param>
         /// <param name="maxHP">Max hp.</param>
         /// <param name="attack">Attack.</param>
-        public void InitializeMonster(int currentHP, int maxHP, int attack, float attackspeed)
+        public void InitializeMonster(int currentHP, int maxHP, int attack)
         {
             monsterHP = currentHP;
             setMonsterMaxHP(maxHP);
@@ -206,8 +206,45 @@ namespace RouteOfTheMagic
             TimeLimit = 1,
         }
 
+        /// <summary>
+        /// Buff overlap type.
+        /// </summary>
+        public enum BuffOverlapType
+        {
+            BuffValueAdd =0,
+            BuffCountRecover =1,
+            BuffNumAdd=2,
+        }
+
+        /// <summary>
+        /// Attack line type.
+        /// </summary>
+        public enum AttackLineType
+        {
+            /// <summary>
+            /// The random.
+            /// </summary>
+            Random = 0,
+            /// <summary>
+            /// The out line of route.
+            /// </summary>
+            OutLine = 1,
+            /// <summary>
+            /// The inside line.
+            /// </summary>
+            InsideLine =2,
+            /// <summary>
+            /// The circle line(Only for boss, rare skill).
+            /// </summary>
+            Circle = 3,
+        }
+
         public struct buff
         {
+            /// <summary>
+            /// The buff identifier.
+            /// </summary>
+            public int buffID;
             /// <summary>
             /// The type of the buff.
             /// </summary>
@@ -225,14 +262,19 @@ namespace RouteOfTheMagic
             /// </summary>
             public int buffValue;
 
-            public buff(BuffType _buffType, BuffLastType _buffLastType, int _buffTime, int _buffValue)
+            public BuffOverlapType buffOverlapType;
+
+            public buff(int _buffID, BuffType _buffType, BuffLastType _buffLastType, int _buffTime, int _buffValue, BuffOverlapType _buffOverlapType)
             {
+                this.buffID = _buffID;
                 this.buffType = _buffType;
                 this.buffLastType = _buffLastType;
                 this.buffTime = _buffTime;
                 this.buffValue = _buffValue;
+                this.buffOverlapType = _buffOverlapType;
             }
         }
+
 
         /// <summary>
         /// Minuses the buff count.
@@ -286,12 +328,26 @@ namespace RouteOfTheMagic
         /// <param name="buffLastTypeNum">Buff last type number.</param>
         /// <param name="buffTime">Buff time.</param>
         /// <param name="tempBuffValue">Temp buff value.</param>
-        public void addBuff(int buffTypeNum, int buffLastTypeNum, int buffTime, int tempBuffValue)
+        public void addBuff(int buffID, int buffTypeNum, int buffLastTypeNum, int buffTime, int tempBuffValue, int buffOverlapType)
         {
-            buff tempbuff = new buff((BuffType)buffTypeNum, 
-                                     (BuffLastType)buffLastTypeNum, 
-                                     buffTime, 
-                                     tempBuffValue);
+            buff tempbuff = new buff(buffID,
+                                     (BuffType)buffTypeNum,
+                                     (BuffLastType)buffLastTypeNum,
+                                     buffTime,
+                                     tempBuffValue,
+                                     (BuffOverlapType)buffOverlapType);
+            //如果是回复持续回合数的技能（比如易伤），以新的buff替换原有buff
+            if (tempbuff.buffOverlapType == BuffOverlapType.BuffCountRecover) 
+            {
+                for (int i = 0; i < buffList.Count; i++)
+                {
+                    if (buffID == buffList[i].buffID)
+                    {
+                        buffList[i] = tempbuff;
+                        return;
+                    }
+                }
+            }
             buffList.Add(tempbuff);
         }
 
@@ -300,8 +356,10 @@ namespace RouteOfTheMagic
         /// </summary>
         /// <param name="tempAttackValue">Temp attack value.</param>
         /// <param name="basicAttackLine">Attack line.</param>
-        public void attackDeclaration(int tempAttackValue,int[] basicAttackLine)
+        public List<int> attackDeclaration()
         {
+            List<int> tempValue = new List<int>();
+            int tempAttackValue = attackValue;
             for (int i = 0; i < buffList.Count; i++)
             {
                 //Add attack buff
@@ -316,7 +374,10 @@ namespace RouteOfTheMagic
                 }
             }
 
-            //attack player *************
+            tempValue.Add(tempAttackValue);
+            tempValue.Add(6);
+            tempValue.Add(11);
+            return tempValue;
         }
 
         /// <summary>
@@ -347,6 +408,34 @@ namespace RouteOfTheMagic
         {
             checkBuffRoundOver();
             checkBuffCount();
+        }
+
+        /// <summary>
+        /// Attacks the player line.
+        /// </summary>
+        /// <param name="attackType">Attack type presented by the enum AttackLineType.</param>
+        public int[] attackPlayerLine(AttackLineType attackType)
+        {
+            int[] temp = null;
+            if (attackType == AttackLineType.Random)
+            {
+                // temp[0] = Random.Range(0)
+                temp[0] = 1;
+            }
+            if (attackType ==AttackLineType.OutLine)
+            {
+
+            }
+            if (attackType == AttackLineType.InsideLine)
+            {
+
+            }
+            if (attackType == AttackLineType.Circle)
+            {
+
+            }
+
+            return temp;
         }
     }
 }
