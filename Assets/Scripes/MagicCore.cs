@@ -25,6 +25,7 @@ public class MagicCore : MonoBehaviour {
         skillTool.magicCore = this;
         mSkill = skillTool.getInitSkills();
         mMonster = new List<Monster>();
+        mMonsterAttack = new List<EDamage>();
 
         MaxHp = 100;
         MaxATK = 3;
@@ -57,6 +58,7 @@ public class MagicCore : MonoBehaviour {
     protected List<Line> mLine;       //边列表
     protected List<Skill> mSkill;     //技能列表
     protected List<Monster> mMonster; //怪物列表
+    protected List<EDamage> mMonsterAttack;  //怪物攻击列表
 
     protected List<Move> mRoute;       //本回合已经走过的路径
 
@@ -524,6 +526,70 @@ public class MagicCore : MonoBehaviour {
         }
     }
 
+    void initMonsterAttack()
+    {
+        mMonsterAttack.Clear(); // 清空
+        for(int mCount = 0;mCount < mMonster.Count;++mCount)
+        {
+            Monster m = mMonster[mCount];
+            if (m.monsterHP > 0)
+            {
+                List<int> atkList = m.attackDeclaration();
+                int power = m.attackValue;
+                foreach (int i in atkList)
+                {
+                    bool find = false;
+                    foreach (EDamage ed in mMonsterAttack)
+                    {
+                        if (i == ed.ID)
+                        {
+                            ed.damage += power;
+                            ed.sorce.Add(mCount);
+                            find = true;
+                        }
+                    }
+                    if (!find)
+                    {
+                        EDamage ed = new EDamage();
+                        ed.sorce = new List<int>();
+                        ed.ID = i;
+                        ed.sorce.Add(mCount);
+                        ed.damage = power;
+                        mMonsterAttack.Add(ed);
+                     }
+                }
+            }
+        }
+    }
+
+    void freshMonsterAttack()
+    {
+        for (int mCount = 0; mCount < mMonster.Count; ++mCount)
+        {
+            Monster m = mMonster[mCount];
+            if (m.monsterHP < 0)
+            {
+                int power = m.attackValue;
+                foreach (EDamage ed in mMonsterAttack)
+                {
+                    for (int i = 0; i < ed.sorce.Count; ++i)
+                    {
+                        if (ed.sorce[i] == mCount)
+                        {
+                            ed.sorce.RemoveAt(i);
+                            ed.damage -= power;
+                            if (ed.damage <= 0)
+                            {
+                                mMonsterAttack.Remove(ed);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    //操作接口
     public void doAttackToMonster(int monsterID, int count, int damage)
     {
         for (int i = 0; i < count; ++i)
@@ -532,10 +598,63 @@ public class MagicCore : MonoBehaviour {
         }
     }
 
-    //操作接口
+    public void doDefence()
+    {
+        foreach (Monster m in mMonster)
+        {
+            //获得攻击倾向
+            List<int> mAT = m.attackDeclaration();
+            //获得攻击力
+            int mATK = m.attackValue / mAT.Count;
+            foreach (int i in mAT)
+            {
+                if (mLine[i].def > mATK)
+                {
+                    //消耗防御力
+                    mLine[i].def -= mATK;
+                }
+                else
+                {
+                    int p1M = -1, p2M = -1;
+                    if (mPoint[mLine[i].p1].isDefence && !mPoint[mLine[i].p1].isBroken)
+                    {
+                        p1M = mPoint[mLine[i].p1].magic;
+                    }
+                    if (mPoint[mLine[i].p2].isDefence && !mPoint[mLine[i].p2].isBroken)
+                    {
+                        p2M = mPoint[mLine[i].p2].magic;
+                    }
+
+                    if (p1M == -1 && p2M == -1)
+                    {
+                        int dam = mATK - mLine[i].def;
+                        Hp -= dam;
+
+                        //执行伤害事件
+                    }
+                    else if (p1M > p2M)
+                    {
+                        mPoint[mLine[i].p1].magic -= 1;
+                    }
+                    else if (p1M < p2M)
+                    {
+                        mPoint[mLine[i].p2].magic -= 1;
+                    }
+                    else
+                    {
+                        if (mPoint[mLine[i].p1].color == PointColor.black)
+                            mPoint[mLine[i].p1].magic -= 1;
+                        else
+                            mPoint[mLine[i].p2].magic -= 1;
+                    }
+
+                }
+            }
+        }
+    }
+
     public void LclickP(int locate)             //左键点击节点时会发生的事件
     {
-        Debug.Log("姜峰背锅");
         if (cf == ClickFlag.normal)          //如果当前指令是通常状态
         {
             if (mPoint[locate].isActivity == true) //如果当前节点是激活状态
@@ -548,6 +667,14 @@ public class MagicCore : MonoBehaviour {
                 }
                 recoverMagic(mRoute[0].pEnd);
                 mRoute.RemoveAt(0);
+            }
+        }
+        if (cf == ClickFlag.defencer)
+        {
+            if (!mPoint[locate].isBroken && Adjacent(locate, mPos) != -1 && DEF > 0)
+            {
+                mPoint[locate].isDefence = true;
+                --DEF;
             }
         }
     }
@@ -737,7 +864,7 @@ public class MagicCore : MonoBehaviour {
         }
     }
 
-    public void addLineDefence(int lineID, float def)
+    public void addLineDefence(int lineID, int def)
     {
         if (lineID != -1)
         {
@@ -750,7 +877,7 @@ public class MagicCore : MonoBehaviour {
     public void startTurn()
     {
         endTurn();
-        cf = ClickFlag.normal;
+        
         //回合开始========================================
         ATK = MaxATK;
         DEF = MaxDEF;
@@ -761,15 +888,15 @@ public class MagicCore : MonoBehaviour {
         m.pEnd = mPos;
         m.moveLine = -1;
 
-        for (int i = 0; i < mLine.Count; ++i)
-        {
-            Line l = mLine[i];
-            l.isPassed = false;
-            l.def = 0;
-            mLine[i] = l;
-        }
-
         mRoute.Add(m);
+
+        //生成怪物攻击
+        initMonsterAttack();
+
+        //执行开始事件
+
+        //刷新怪物攻击
+        freshMonsterAttack();
     }
 
     public void endTurn()
@@ -779,12 +906,34 @@ public class MagicCore : MonoBehaviour {
         {
             recoverMagic(m.pEnd);
         }
+        
+        //恢复节点状态
+        for (int i = 0; i < mLine.Count; ++i)
+        {
+            Line l = mLine[i];
+            l.isPassed = false;
+            l.def = 0;
+            mLine[i] = l;
+        }
+
+        foreach (Point p in mPoint)
+        {
+            p.isActivity = false;
+            p.isDefence = false;
+        }
+
+        cf = ClickFlag.normal;
 
         mRoute.Clear();
         DragDoc.Clear();
     }
-    //查询接口
 
+    public List<EDamage> getMonsterATK()
+    { 
+        return mMonsterAttack;
+    } 
+
+    //查询接口
     public Point getPoint(int pNo)
     {
         return mPoint[pNo];
@@ -1096,6 +1245,17 @@ public class MagicCore : MonoBehaviour {
     public ClickFlag getFlag()
     {
         return cf;
+    }
+
+    public bool isMonsterLive(int i)
+    {
+        bool r = false;
+        if (i < mMonster.Count)
+        {
+            if (mMonster[i].monsterHP > 0)
+                r = true;
+        }
+        return r;
     }
 
     //设置接口

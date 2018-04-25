@@ -21,12 +21,14 @@ public class Clickcontrol : MonoBehaviour {
     private List<GameObject> lineGameObjectlist;
 
     public static bool isDrag;
+    private bool isAttacking;
     // Use this for initialization
     void Start () { 
         magic = new MagicCore();
         monster = new Monster();
         lineGameObjectlist = new List<GameObject>();
         isDrag = false;
+        isAttacking = false;
         instance = node;
 
         magic.addMonster(monster0.GetComponent<Monster>());
@@ -54,6 +56,9 @@ public class Clickcontrol : MonoBehaviour {
 
         //检查节点信息
         pointStatus();
+
+        //检查线上的信息
+        lineStatus();
     }
     //初始化
     public void startinit()
@@ -113,11 +118,12 @@ public class Clickcontrol : MonoBehaviour {
             //查询节点坐标
             Vector3 pos1 = GameObject.FindGameObjectWithTag(p1.ToString()).transform.position;
             Vector3 pos2 = GameObject.FindGameObjectWithTag(p2.ToString()).transform.position;
-            //生成节点
+            //生成线
             linePerb.GetComponent<LineRenderer>().SetPosition(0, pos1);
             linePerb.GetComponent<LineRenderer>().SetPosition(1, pos2);
             if (Plist[p1].MaxMagic!=0 && Plist[p2].MaxMagic != 0)
             {
+                
                 lineGameObjectlist.Add(GameObject.Instantiate(linePerb));
             }
         }
@@ -202,6 +208,32 @@ public class Clickcontrol : MonoBehaviour {
         {
             if (magic.getPointBroked(i))
                 GameObject.FindGameObjectWithTag(i.ToString()).GetComponent<SpriteRenderer>().sprite = mySprite;
+        }
+    }
+
+    //检查线上的信息
+    public void lineStatus()
+    {
+        List<Line> lineList = magic.getLine();
+        List<EDamage>edList = magic.getMonsterATK();
+        foreach (EDamage ed in edList)
+        {
+            if (ed.damage != 0)
+                foreach (Transform child in lineGameObjectlist[ed.ID].transform)
+                {
+                    Vector3 pos1 = child.parent.GetComponent<LineRenderer>().GetPosition(0);
+                    Vector3 pos2 = child.parent.GetComponent<LineRenderer>().GetPosition(1);
+                    if (child.name == "Damage")
+                    {
+                        child.position = new Vector3((pos1.x + pos2.x) / 2, (pos1.y + pos2.y) / 2 + 0.5f, 0);
+                        child.GetComponent<TextMesh>().text = ed.damage.ToString();
+                    }
+                    else if (child.name == "Defence")
+                    {
+                        child.position = new Vector3((pos1.x + pos2.x) / 2, (pos1.y + pos2.y) / 2 - 0.5f, 0);
+                        child.GetComponent<TextMesh>().text = lineList[ed.ID].def.ToString();
+                    }
+                }
         }
     }
 }
