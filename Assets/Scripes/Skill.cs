@@ -85,7 +85,7 @@ public class SkillTool {
         //添加防御路径
         for (int i = 0; i < mainRoute.Count; i++)
         {
-            magicCore.addLineDefence(mainRoute[i].moveLine, basic * 3.0f);
+            magicCore.addLineDefence(mainRoute[i].moveLine, (int)(basic * 3.0f));
         }
 
         //添加火焰反伤状态

@@ -143,6 +143,7 @@ namespace RouteOfTheMagic
             isUnpassable = false;
             isBroken = false;
             isActivity = false;
+            isDefence = false;
         }
 
         //节点属性
@@ -157,6 +158,7 @@ namespace RouteOfTheMagic
         public bool isUnpassable;       //不能通过么
         public bool isBroken;           //坏了么
         public bool isActivity;         //位于激活状态么
+        public bool isDefence;          //防御状态
 
         public List<BuffBasic> buff;
     };
@@ -183,7 +185,7 @@ namespace RouteOfTheMagic
         //状态
         public bool isUnpassable;   //不能通过么
         public bool isPassed;     //这回合已经走过了么
-        public float def;         //这个路径的护盾值
+        public int def;         //这个路径的护盾值
 
         public List<BuffBasic> buff;
     };
@@ -299,9 +301,17 @@ namespace RouteOfTheMagic
     public struct Damage
     {
         public int dam;                //单次攻击的伤害
-        public int count;              //攻击次数
         public int dRasour;            //伤害来源
     }
+
+    public class EDamage
+    {
+        public int ID;
+        public int damage;
+        public List<int> sorce;
+    }
+
+   
 
     /// <summary>
     /// 移动时触发的事件
