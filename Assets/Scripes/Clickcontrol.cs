@@ -7,9 +7,6 @@ using RouteOfTheMagic;
 
 public class Clickcontrol : MonoBehaviour {
 
-    [SerializeField]
-    Sprite mySprite;
-
     public MagicCore magic;
     public Monster monster;
     public GameObject node;
@@ -32,6 +29,7 @@ public class Clickcontrol : MonoBehaviour {
         instance = node;
 
         magic.addMonster(monster0.GetComponent<Monster>());
+        magic.startTurn();
 
         //初始化节点位置
         InitPointPos();
@@ -54,20 +52,25 @@ public class Clickcontrol : MonoBehaviour {
         //设定skill的状态
         skillStatus();
 
-        //检查节点信息
-        pointStatus();
-
         //检查线上的信息
         lineStatus();
     }
     //初始化
     public void startinit()
     {
-        //if (magic.getFlag() == ClickFlag.defencer)
+        btnGameObject = EventSystem.current.currentSelectedGameObject;
+        if (magic.getFlag() == ClickFlag.defencer)
+        {
             magic.startTurn();
-
-        //if (magic.getFlag() == ClickFlag.normal)
-            //magic.setFlag(ClickFlag.defencer);
+            btnGameObject.GetComponent<Image>().color = Color.red;
+        }
+        else if (magic.getFlag() == ClickFlag.normal || magic.getFlag() == ClickFlag.target)
+        {
+            magic.endTurn();
+            magic.setFlag(ClickFlag.defencer);
+            btnGameObject.GetComponent<Image>().color = Color.green;
+      
+        }
 
     }
 
@@ -120,11 +123,18 @@ public class Clickcontrol : MonoBehaviour {
             //生成线
             linePerb.GetComponent<LineRenderer>().SetPosition(0, pos1);
             linePerb.GetComponent<LineRenderer>().SetPosition(1, pos2);
+           
+
+            GameObject lineP = GameObject.Instantiate(linePerb);
+            lineP.SetActive(false);
+            lineGameObjectlist.Add(lineP);
+
             if (Plist[p1].MaxMagic!=0 && Plist[p2].MaxMagic != 0)
             {
-                
-                lineGameObjectlist.Add(GameObject.Instantiate(linePerb));
+                lineP.SetActive(true);
             }
+                
+
         }
     }
     
@@ -199,16 +209,7 @@ public class Clickcontrol : MonoBehaviour {
             }
         }
     }
-
-    //节点信息
-    public void pointStatus()
-    {
-        for (int i=0;i<19;++i)
-        {
-            if (magic.getPointBroked(i))
-                GameObject.FindGameObjectWithTag(i.ToString()).GetComponent<SpriteRenderer>().sprite = mySprite;
-        }
-    }
+    
 
     //检查线上的信息
     public void lineStatus()
@@ -218,6 +219,7 @@ public class Clickcontrol : MonoBehaviour {
         foreach (EDamage ed in edList)
         {
             if (ed.damage != 0)
+            {
                 foreach (Transform child in lineGameObjectlist[ed.ID].transform)
                 {
                     Vector3 pos1 = child.parent.GetComponent<LineRenderer>().GetPosition(0);
@@ -233,6 +235,14 @@ public class Clickcontrol : MonoBehaviour {
                         child.GetComponent<TextMesh>().text = lineList[ed.ID].def.ToString();
                     }
                 }
+            }
+            else
+            {
+                foreach (Transform child in lineGameObjectlist[ed.ID].transform)
+                {
+                    child.GetComponent<TextMesh>().text = null;
+                }
+            }
         }
     }
 }

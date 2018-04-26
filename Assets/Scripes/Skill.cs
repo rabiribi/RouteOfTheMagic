@@ -128,7 +128,7 @@ public class SkillTool {
         float atk = 0;
         for (int i = pStart; i <= pEnd; ++i)
         {
-            atk += point[route[i].pEnd].magic;
+            atk += point[route[i].pEnd].MaxMagic;
         }
 
         atk = atk * magic.skill.power + magic.skill.basic;

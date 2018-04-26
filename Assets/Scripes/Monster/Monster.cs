@@ -374,7 +374,7 @@ namespace RouteOfTheMagic
                 }
             }
 
-            tempValue.Add(tempAttackValue);
+            //tempValue.Add(tempAttackValue);
             tempValue.Add(6);
             tempValue.Add(11);
             return tempValue;

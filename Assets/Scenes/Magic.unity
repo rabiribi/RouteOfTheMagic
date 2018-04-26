@@ -188,7 +188,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bb0c15bcb9c651418f85fdc0fec9305, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mySprite: {fileID: 10917, guid: 0000000000000000f000000000000000, type: 0}
   magic: {fileID: 0}
   monster: {fileID: 0}
   node: {fileID: 1946794148090124, guid: 290e6b4581dc6da43b1e4572eacad255, type: 2}
@@ -249,11 +248,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 3
       objectReference: {fileID: 0}
-    - target: {fileID: 212459977172841548, guid: 290e6b4581dc6da43b1e4572eacad255,
-        type: 2}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 290e6b4581dc6da43b1e4572eacad255, type: 2}
   m_IsPrefabParent: 0
@@ -391,9 +385,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fbc65f534fe74caca20b35bd99391a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  monsterHP: 10
-  maxMonsterHP: 10
-  attackValue: 1
+  monsterHP: 100
+  maxMonsterHP: 100
+  attackValue: 20
   attackLine: 
   dodgeValue: 0
 --- !u!1 &274824009
@@ -1565,7 +1559,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:

@@ -28,8 +28,9 @@ public class MagicCore : MonoBehaviour {
         mMonsterAttack = new List<EDamage>();
 
         MaxHp = 100;
-        MaxATK = 3;
+        MaxATK = 10;
         MaxDEF = 1;
+        Hp = MaxHp;
         mPos = 0;
 
     }
@@ -130,7 +131,7 @@ public class MagicCore : MonoBehaviour {
             {
                 if (subRstart != -1)
                     break;
-                if (mPoint[mRoute[i].pEnd].color == require[0])
+                if (mPoint[mRoute[i].pEnd].color == require[0] && !mPoint[mRoute[i].pEnd].isBroken)
                 {
                     subRstart = i;
                     require.RemoveAt(0);
@@ -144,7 +145,7 @@ public class MagicCore : MonoBehaviour {
                 {
                     if (require.Count == 1) //如果所有中间节点已经处理完毕
                         break;
-                    if (mPoint[mRoute[i].pEnd].color == require[0])
+                    if (mPoint[mRoute[i].pEnd].color == require[0] && !mPoint[mRoute[i].pEnd].isBroken)
                     {
                         subRstart = i;
                         require.RemoveAt(0);
@@ -155,7 +156,7 @@ public class MagicCore : MonoBehaviour {
                     //判断终点
                     for (int i = subRstart + 1; i < mRoute.Count; ++i)
                     {
-                        if (mPoint[mRoute[i].pEnd].color == require[0])
+                        if (mPoint[mRoute[i].pEnd].color == require[0] && !mPoint[mRoute[i].pEnd].isBroken)
                         {
                             subRend = i;
                         }
@@ -182,7 +183,7 @@ public class MagicCore : MonoBehaviour {
             {
                 if (subRstart != -1)
                     break;
-                if (mPoint[mRoute[i].pEnd].color == require[require.Count - 1])
+                if (mPoint[mRoute[i].pEnd].color == require[require.Count - 1] && !mPoint[mRoute[i].pEnd].isBroken)
                 {
                     subRstart = i;
                     require.RemoveAt(require.Count - 1);
@@ -198,7 +199,7 @@ public class MagicCore : MonoBehaviour {
             {
                 if (require.Count == 1) //如果所有中间节点已经处理完毕
                     break;
-                if (mPoint[mRoute[i].pEnd].color == require[require.Count - 1])
+                if (mPoint[mRoute[i].pEnd].color == require[require.Count - 1] && !mPoint[mRoute[i].pEnd].isBroken)
                 {
                     subRstart = i;
                     require.RemoveAt(require.Count - 1);
@@ -212,7 +213,7 @@ public class MagicCore : MonoBehaviour {
             //判断终点
             for (int i = subRstart + 1; i < mRoute.Count; ++i)
             {
-                if (mPoint[mRoute[i].pEnd].color == require[require.Count - 1])
+                if (mPoint[mRoute[i].pEnd].color == require[require.Count - 1] && !mPoint[mRoute[i].pEnd].isBroken)
                 {
                     subRend = i;
                 }
@@ -247,7 +248,7 @@ public class MagicCore : MonoBehaviour {
                 for (int i = 0; i < mRoute.Count; ++i)
                 {
                     for (int j = 0; j < require.Count; ++j)
-                        if (mPoint[mRoute[i].pEnd].color == require[j])
+                        if (mPoint[mRoute[i].pEnd].color == require[j] && !mPoint[mRoute[i].pEnd].isBroken)
                         {
                             require.RemoveAt(j);
                             pS = i;
@@ -257,7 +258,7 @@ public class MagicCore : MonoBehaviour {
                 for (int i = mRoute.Count - 1; i >= 0; --i)
                 {
                     for (int j = 0; j < require.Count; ++j)
-                        if (mPoint[mRoute[i].pEnd].color == require[j])
+                        if (mPoint[mRoute[i].pEnd].color == require[j] && !mPoint[mRoute[i].pEnd].isBroken)
                         {
                             require.RemoveAt(j);
                             pE = i;
@@ -269,7 +270,7 @@ public class MagicCore : MonoBehaviour {
                     for (int i = pS + 1; i < pE; ++i)
                     {
                         for (int j = 0; j < require.Count; ++j)
-                            if (mPoint[mRoute[i].pEnd].color == require[j])
+                            if (mPoint[mRoute[i].pEnd].color == require[j] && !mPoint[mRoute[i].pEnd].isBroken)
                             {
                                 require.RemoveAt(j);
                             }
@@ -293,7 +294,7 @@ public class MagicCore : MonoBehaviour {
                 for (int i = mRoute.Count - 1; i >= 0; --i)
                 {
                     for (int j = 0; j < require.Count; ++j)
-                        if (mPoint[mRoute[i].pEnd].color == require[j])
+                        if (mPoint[mRoute[i].pEnd].color == require[j] && !mPoint[mRoute[i].pEnd].isBroken)
                         {
                             require.RemoveAt(j);
                             pE = i;
@@ -303,7 +304,7 @@ public class MagicCore : MonoBehaviour {
                 for (int i = 0; i < mRoute.Count; ++i)
                 {
                     for (int j = 0; j < require.Count; ++j)
-                        if (mPoint[mRoute[i].pEnd].color == require[j])
+                        if (mPoint[mRoute[i].pEnd].color == require[j] && !mPoint[mRoute[i].pEnd].isBroken)
                         {
                             require.RemoveAt(j);
                             pS = i;
@@ -315,7 +316,7 @@ public class MagicCore : MonoBehaviour {
                     for (int i = pS + 1; i < pE; ++i)
                     {
                         for (int j = 0; j < require.Count; ++j)
-                            if (mPoint[mRoute[i].pEnd].color == require[j])
+                            if (mPoint[mRoute[i].pEnd].color == require[j] && !mPoint[mRoute[i].pEnd].isBroken)
                             {
                                 require.RemoveAt(j);
                             }
@@ -344,7 +345,7 @@ public class MagicCore : MonoBehaviour {
             //顺序找第一个点
             for (int i = 0; i < mRoute.Count; ++i)
             {
-                if (mPoint[mRoute[i].pEnd].color == pc[0])
+                if (mPoint[mRoute[i].pEnd].color == pc[0] && !mPoint[mRoute[i].pEnd].isBroken)
                 {
                     subRoute.Add(i);
                     subRoute.Add(i);
@@ -495,10 +496,14 @@ public class MagicCore : MonoBehaviour {
         }
 
         //更新mRoute
-        for (int i = 0; i <= REnd; ++i)
+        for (int i = 0; i < REnd; ++i)
         {
             mRoute.RemoveAt(0);
         }
+        Move move = mRoute[0];
+        move.pStart = move.pEnd;
+        move.moveLine = -1;
+        mRoute[0] = move;
     }
 
     void recoverMagic(int id)
@@ -519,7 +524,7 @@ public class MagicCore : MonoBehaviour {
     {
         foreach (Point p in mPoint)
         {
-            if (p.magic < -1)
+            if (p.magic < 0)
             {
                 p.isBroken = true;
             }
@@ -536,30 +541,27 @@ public class MagicCore : MonoBehaviour {
             {
                 List<int> atkList = m.attackDeclaration();
                 int power = m.attackValue;
-                foreach (int i in atkList)
+
+                for (int i = 0; i < mLine.Count; ++i)
                 {
-                    bool find = false;
-                    foreach (EDamage ed in mMonsterAttack)
+                    EDamage ed = new EDamage();
+                    ed.damage = 0;
+                    ed.ID = i;
+                    ed.sorce = new List<int>();
+                    foreach (int atkline in atkList)
                     {
-                        if (i == ed.ID)
+                        if (atkline == i)
                         {
-                            ed.damage += power;
+                            ed.damage = power;
                             ed.sorce.Add(mCount);
-                            find = true;
                         }
                     }
-                    if (!find)
-                    {
-                        EDamage ed = new EDamage();
-                        ed.sorce = new List<int>();
-                        ed.ID = i;
-                        ed.sorce.Add(mCount);
-                        ed.damage = power;
-                        mMonsterAttack.Add(ed);
-                     }
+                    mMonsterAttack.Add(ed);
                 }
+                
             }
         }
+        
     }
 
     void freshMonsterAttack()
@@ -567,8 +569,9 @@ public class MagicCore : MonoBehaviour {
         for (int mCount = 0; mCount < mMonster.Count; ++mCount)
         {
             Monster m = mMonster[mCount];
-            if (m.monsterHP < 0)
+            if (m.monsterHP <= 0)
             {
+                
                 int power = m.attackValue;
                 foreach (EDamage ed in mMonsterAttack)
                 {
@@ -580,7 +583,7 @@ public class MagicCore : MonoBehaviour {
                             ed.damage -= power;
                             if (ed.damage <= 0)
                             {
-                                mMonsterAttack.Remove(ed);
+                                ed.damage = 0;
                             }
                         }
                     }
@@ -600,14 +603,13 @@ public class MagicCore : MonoBehaviour {
 
     public void doDefence()
     {
-        foreach (Monster m in mMonster)
+        foreach (EDamage ed in mMonsterAttack)
         {
-            //获得攻击倾向
-            List<int> mAT = m.attackDeclaration();
-            //获得攻击力
-            int mATK = m.attackValue / mAT.Count;
-            foreach (int i in mAT)
+            if (ed.damage != 0)
             {
+                int mATK = ed.damage;
+                int i = ed.ID;
+
                 if (mLine[i].def > mATK)
                 {
                     //消耗防御力
@@ -647,10 +649,11 @@ public class MagicCore : MonoBehaviour {
                         else
                             mPoint[mLine[i].p2].magic -= 1;
                     }
-
                 }
             }
         }
+
+        detectPointBroken();
     }
 
     public void LclickP(int locate)             //左键点击节点时会发生的事件
@@ -660,18 +663,52 @@ public class MagicCore : MonoBehaviour {
             if (mPoint[locate].isActivity == true) //如果当前节点是激活状态
             {
                 //在mRoute里搜索
-                while (mRoute[0].pEnd != locate)
+                int Loc = -1;
+                for (int i = 0; i < mRoute.Count; ++i)
                 {
-                    recoverMagic(mRoute[0].pEnd);
-                    mRoute.RemoveAt(0);
+                    if (mRoute[i].pEnd == locate)
+                    {
+                        Loc = i;
+                        break;
+                    }
                 }
-                recoverMagic(mRoute[0].pEnd);
-                mRoute.RemoveAt(0);
+                if (Loc != -1)
+                {
+                    for (int i = 0; i <= Loc; ++i)
+                    {
+                        recoverMagic(mRoute[0].pEnd);
+                        mRoute.RemoveAt(0);
+                    }
+
+                    if (mRoute.Count != 0)
+                    {
+                        Move m = mRoute[0];
+                        m.pStart = m.pEnd;
+                        m.moveLine = -1;
+                        mRoute[0] = m;
+                    }
+                    else
+                    {
+                        Move m = new Move();
+                        m.pStart = mPos;
+                        m.pEnd = mPos;
+                        m.moveLine = -1;
+                        mRoute.Add(m);
+                    }
+
+                    foreach (Move m in mRoute)
+                    {
+                        if (m.pEnd == locate)
+                            mPoint[locate].isActivity = true;
+                    }
+                }
             }
+
+            FreshSkillActivity();
         }
         if (cf == ClickFlag.defencer)
         {
-            if (!mPoint[locate].isBroken && Adjacent(locate, mPos) != -1 && DEF > 0)
+            if (!mPoint[locate].isBroken && (Adjacent(locate, mPos) != -1||locate == mPos) && DEF > 0)
             {
                 mPoint[locate].isDefence = true;
                 --DEF;
@@ -704,6 +741,8 @@ public class MagicCore : MonoBehaviour {
                     s.useable = false;
                     cosumeMagic(skillReady);
                     detectPointBroken();
+                    //刷新怪物攻击
+                    freshMonsterAttack();
                     //统计变化
                     pointUsedCount += skillReady.magicRoute[1] - skillReady.magicRoute[0] + 1;
                 }
@@ -724,6 +763,8 @@ public class MagicCore : MonoBehaviour {
             //消耗魔力
             cosumeMagic(skillReady);
             detectPointBroken();
+            //刷新怪物攻击
+            freshMonsterAttack();
             //清空路径
             pointUsedCount += skillReady.magicRoute[1] - skillReady.magicRoute[0] + 1;
             //改变点击状态
@@ -790,6 +831,15 @@ public class MagicCore : MonoBehaviour {
 
                 DragDoc.RemoveAt(DragDoc.Count - 1);
                 ++ATK;
+            }
+        }
+
+        if (cf == ClickFlag.defencer)
+        {
+            foreach (Point p in mPoint)
+            {
+                p.isDefence = false;
+                ++DEF;
             }
         }
 
@@ -876,8 +926,10 @@ public class MagicCore : MonoBehaviour {
 
     public void startTurn()
     {
-        endTurn();
-        
+        //挨打
+        doDefence();
+
+        cf = ClickFlag.normal;
         //回合开始========================================
         ATK = MaxATK;
         DEF = MaxDEF;
@@ -890,6 +942,14 @@ public class MagicCore : MonoBehaviour {
 
         mRoute.Add(m);
 
+        mPoint[mPos].isActivity = true;
+
+        foreach (Point p in mPoint)
+        {
+            p.isDefence = false;
+        }
+
+
         //生成怪物攻击
         initMonsterAttack();
 
@@ -901,6 +961,7 @@ public class MagicCore : MonoBehaviour {
 
     public void endTurn()
     {
+        
         //回复魔力
         foreach (Move m in mRoute)
         {
@@ -922,8 +983,9 @@ public class MagicCore : MonoBehaviour {
             p.isDefence = false;
         }
 
-        cf = ClickFlag.normal;
+       
 
+        FreshSkillActivity();
         mRoute.Clear();
         DragDoc.Clear();
     }
@@ -1168,6 +1230,10 @@ public class MagicCore : MonoBehaviour {
     {
         lineState ls = lineState.normal;
         //查看这个节点是不是passed
+        if (cf == ClickFlag.defencer)
+        {
+            return ls;
+        }
         if (mLine[l].isPassed)
             ls = lineState.used;
         //看看这个边是不是拖动中
@@ -1261,6 +1327,16 @@ public class MagicCore : MonoBehaviour {
     public bool isDefencer(int i)
     {
         return mPoint[i].isDefence;
+    }
+
+    public bool isDragChangged()
+    {
+        bool r = false;
+        if (DragDoc.Count > 0)
+        {
+            r = true;
+        }
+        return r;
     }
 
     //设置接口
