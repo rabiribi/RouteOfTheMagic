@@ -3,19 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using RouteOfTheMagic;
 
-public class MagicCore : MonoBehaviour {
-    // Use this for initialization
-    void Start() {
-
-    }
-
-    // Update is called once per frame
-    void Update() {
-
-    }
-
+public class MagicCore{
     public MagicCore()                                    //默认初始化
     {
+        if (instance == null)
+            instance = this;
         mLine = getInitLine();
         mPoint = getInitPoint();
         mRoute = new List<Move>();
@@ -73,6 +65,20 @@ public class MagicCore : MonoBehaviour {
 
     //人物的公用事件列表
     List<BuffBasic> buffList;
+    private static MagicCore instance;
+
+    public static MagicCore Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance =new MagicCore();
+                Debug.Log("shilighua");
+            }
+            return instance;
+        }
+    }
 
     int Adjacent(int p1, int p2)
     {

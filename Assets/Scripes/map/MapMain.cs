@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 namespace RouteOfTheMagic
 {
@@ -68,12 +69,16 @@ namespace RouteOfTheMagic
         private UiRender render;
         public int layerCount = 5;
         public Sprite sprite;
+        public MagicCore magicCore;
         // Use this for initialization
-       
+
         void Start()
         {
-            render = mapRoot.GetComponent<UiRender>();
+            magicCore = MagicCore.Instance;
+            render = mapRoot.transform.GetChild(0).GetComponent<UiRender>();
             Init();
+
+            DontDestroyOnLoad(this.gameObject);
             
         }
         //初始化地图
@@ -270,6 +275,11 @@ namespace RouteOfTheMagic
         /// </summary>
         void buttonResponse(MapNode mapNode)
         {
+            if(mapNode.nodeType==NodeType.fight)
+            {
+                SceneManager.LoadSceneAsync("Magic");
+                mapRoot.SetActive(false);
+            }
             Debug.Log(mapNode.nodeType);
         }
         ButtonEx CreatButton(Vector2 pos,Vector2 size, Sprite sprite,Color color= new Color())
