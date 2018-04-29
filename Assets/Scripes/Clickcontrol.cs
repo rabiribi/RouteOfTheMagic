@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using RouteOfTheMagic;
+using UnityEngine.SceneManagement;
 
 public class Clickcontrol : MonoBehaviour {
 
@@ -45,7 +46,7 @@ public class Clickcontrol : MonoBehaviour {
         GameObject.Find("DEF").GetComponent<Text>().text = "DEF: "+magic.getDEF().ToString();
         GameObject.Find("HP").GetComponent<Text>().text = "HP:" + magic.getHP().ToString();
         //测试monster，获取血量等
-        monster0.GetComponentInChildren<Text>().text = monster0.GetComponent<Monster>().monsterHP.ToString();
+        monster0.GetComponentInChildren<Text>().text = "HP:"+monster0.GetComponent<Monster>().monsterHP.ToString();
         //绘制连线颜色
         drawLineColor();
 
@@ -54,6 +55,10 @@ public class Clickcontrol : MonoBehaviour {
 
         //检查线上的信息
         lineStatus();
+
+        //esc退出
+        if (Input.GetKey(KeyCode.Escape))
+            Application.Quit();
     }
     //初始化
     public void startinit()
@@ -244,5 +249,11 @@ public class Clickcontrol : MonoBehaviour {
                 }
             }
         }
+    }
+
+    //临时重新加载
+    public void restart()
+    {
+        SceneManager.LoadScene("Magic");
     }
 }

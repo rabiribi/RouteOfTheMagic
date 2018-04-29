@@ -1139,25 +1139,25 @@ public class MagicCore : MonoBehaviour {
     {
         List<Point> r = new List<Point>();
 
-        Point p = new Point(0, PointColor.white, PointType.normal, 3, new List<int> { 0, 1, 2, 3, 4, 5 });
+        Point p = new Point(0, PointColor.white, PointType.normal, 4, new List<int> { 0, 1, 2, 3, 4, 5 });
         r.Add(p);
 
-        p = new Point(1, PointColor.black, PointType.normal, 1, new List<int> { 0, 6, 11, 12, 23 });
+        p = new Point(1, PointColor.black, PointType.normal, 2, new List<int> { 0, 6, 11, 12, 23 });
         r.Add(p);
 
-        p = new Point(2, PointColor.black, PointType.normal, 1, new List<int> { 1, 6, 7, 13, 14 });
+        p = new Point(2, PointColor.black, PointType.normal, 2, new List<int> { 1, 6, 7, 13, 14 });
         r.Add(p);
 
-        p = new Point(3, PointColor.black, PointType.normal, 1, new List<int> { 2, 7, 8, 15, 16 });
+        p = new Point(3, PointColor.black, PointType.normal, 2, new List<int> { 2, 7, 8, 15, 16 });
         r.Add(p);
 
-        p = new Point(4, PointColor.black, PointType.normal, 1, new List<int> { 3, 8, 9, 17, 18 });
+        p = new Point(4, PointColor.black, PointType.normal, 2, new List<int> { 3, 8, 9, 17, 18 });
         r.Add(p);
 
-        p = new Point(5, PointColor.black, PointType.normal, 1, new List<int> { 4, 9, 10, 19, 20 });
+        p = new Point(5, PointColor.black, PointType.normal, 2, new List<int> { 4, 9, 10, 19, 20 });
         r.Add(p);
 
-        p = new Point(6, PointColor.black, PointType.normal, 1, new List<int> { 5, 10, 11, 21, 22 });
+        p = new Point(6, PointColor.black, PointType.normal, 2, new List<int> { 5, 10, 11, 21, 22 });
         r.Add(p);
 
         p = new Point(7, PointColor.red, PointType.normal, 0, new List<int> { 12, 13, 30, 31 });
