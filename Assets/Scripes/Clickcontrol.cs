@@ -21,8 +21,8 @@ public class Clickcontrol : MonoBehaviour {
     public static bool isDrag;
     private bool isAttacking;
     // Use this for initialization
-    void Start () { 
-        magic = new MagicCore();
+    void Start () {
+        magic = MagicCore.Instance;
         monster = new Monster();
         lineGameObjectlist = new List<GameObject>();
         isDrag = false;

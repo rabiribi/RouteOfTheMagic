@@ -109,6 +109,11 @@ namespace RouteOfTheMagic
         normal = 0,                       //选择路径/选取技能
         defencer = 1,                     //选择防御节点
         target = 2,                       //选择施法对象
+        upgrade = 4,                      //要升级节点的时候
+        transToRed = 5,
+        transToBlue = 6,
+        transToYellow = 7,
+        TransToWhite = 8,
         count
     };
 

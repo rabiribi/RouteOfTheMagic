@@ -3,19 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using RouteOfTheMagic;
 
-public class MagicCore : MonoBehaviour {
-    // Use this for initialization
-    void Start() {
-
-    }
-
-    // Update is called once per frame
-    void Update() {
-
-    }
-
+public class MagicCore{
     public MagicCore()                                    //默认初始化
     {
+        if (instance == null)
+            instance = this;
         mLine = getInitLine();
         mPoint = getInitPoint();
         mRoute = new List<Move>();
@@ -32,6 +24,8 @@ public class MagicCore : MonoBehaviour {
         MaxDEF = 1;
         Hp = MaxHp;
         mPos = 0;
+
+        skillPoint = 3;
 
     }
 
@@ -73,6 +67,25 @@ public class MagicCore : MonoBehaviour {
 
     //人物的公用事件列表
     List<BuffBasic> buffList;
+
+    //全局变量
+    public int skillPoint; //剩余技能点数
+    public int Money;      //金钱
+
+    private static MagicCore instance;
+
+    public static MagicCore Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance =new MagicCore();
+                Debug.Log("shilighua");
+            }
+            return instance;
+        }
+    }
 
     int Adjacent(int p1, int p2)
     {
@@ -714,6 +727,32 @@ public class MagicCore : MonoBehaviour {
                 --DEF;
             }
         }
+        if (cf == ClickFlag.upgrade)
+        {
+            if(isPointUpgradable(locate))
+                pointUpgrade(locate);
+
+        }
+        if (cf == ClickFlag.transToBlue)
+        {
+            if (isPointTransable(locate))
+                pointTrans(locate, PointColor.blue);
+        }
+        if (cf == ClickFlag.transToRed)
+        {
+            if (isPointTransable(locate))
+                pointTrans(locate, PointColor.red);
+        }
+        if (cf == ClickFlag.transToYellow)
+        {
+            if (isPointTransable(locate))
+                pointTrans(locate, PointColor.yellow);
+        }
+        if (cf == ClickFlag.TransToWhite)
+        {
+            if (isPointTransable(locate))
+                pointTrans(locate, PointColor.white);
+        }
     }
 
     public void LclickS(int skillNum)           //左键点击技能时会发生的事件
@@ -993,7 +1032,47 @@ public class MagicCore : MonoBehaviour {
     public List<EDamage> getMonsterATK()
     { 
         return mMonsterAttack;
-    } 
+    }
+
+    public void Victory()
+    {
+        //清除所有的战斗状态（不含道具）
+        for (int i = 0; i < buffList.Count; ++i)
+        {
+            BuffBasic b = buffList[i];
+            if (b.turn > 0)
+            {
+                buffList.RemoveAt(i);
+            }
+        }
+
+        //清除怪物列表
+        mMonster.Clear();
+        mMonsterAttack.Clear();
+
+        //将魔术盘回复到完整状态
+        foreach (Point p in mPoint)
+        {
+            p.buff.Clear();
+            p.isActivity = false;
+            p.isBroken = false;
+            p.isDefence = false;
+            p.isUnpassable = false;
+            p.magic = p.MaxMagic;
+        }
+
+        foreach (Line l in mLine)
+        {
+            l.isPassed = false;
+            l.isUnpassable = false;
+        }
+
+        //获取战斗胜利的奖励
+        skillPoint += 1;
+        Money += 10;
+    }
+
+
 
     //查询接口
     public Point getPoint(int pNo)
@@ -1337,6 +1416,79 @@ public class MagicCore : MonoBehaviour {
             r = true;
         }
         return r;
+    }
+
+    /// <summary>
+    /// 节点可以升级么
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public bool isPointUpgradable(int id)
+    {
+        Point p = mPoint[id];
+        int need = 1;
+        if (p.color != PointColor.black)
+        {
+            need = 2;
+        }
+        return skillPoint >= need;
+    }
+
+    //查询节点是否可以变质
+    public bool isPointTransable(int id)
+    {
+        bool r = false;
+        if (mPoint[id].color == PointColor.black && mPoint[id].MaxMagic >= 5 && skillPoint >= 3)
+        {
+            r = true;
+        }
+        return r;
+    }
+
+   /// <summary>
+   /// 升级节点
+   /// </summary>
+   /// <param name="id"></param>
+    public void pointUpgrade(int id)
+    {
+        Point p = mPoint[id];
+        if (p.color == PointColor.black)
+        {
+            if (skillPoint >= 1)
+            {
+                --skillPoint;
+                ++p.MaxMagic;
+                p.magic = p.MaxMagic;
+            }
+        }
+        else if (skillPoint >= 2)
+        {
+            skillPoint -= 2;
+            if (p.color == PointColor.white)
+            {
+                p.MaxMagic += 3;
+            }
+            else
+            {
+                p.MaxMagic += 2;
+            }
+            p.magic = p.MaxMagic;
+        }
+    }
+
+    /// <summary>
+    /// 转化节点
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="pc"></param>
+    public void pointTrans(int id, PointColor pc)
+    {
+        Point p = mPoint[id];
+        if (skillPoint >= 3 && p.color == PointColor.black && p.MaxMagic >= 5)
+        {
+            p.color = pc;
+            skillPoint -= 3;
+        }
     }
 
     //设置接口
