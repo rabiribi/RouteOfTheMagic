@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using RouteOfTheMagic;
 
-public class MagicCore{
+public class MagicCore {
     public MagicCore()                                    //默认初始化
     {
-        if (instance == null)
+       if (instance == null)
             instance = this;
         mLine = getInitLine();
         mPoint = getInitPoint();
@@ -15,9 +15,11 @@ public class MagicCore{
 
         skillTool = new SkillTool();
         skillTool.magicCore = this;
+        skillTool.buffTool.magic = this;
         mSkill = skillTool.getInitSkills();
         mMonster = new List<Monster>();
         mMonsterAttack = new List<EDamage>();
+        buffList = new List<BuffBasic>();
 
         MaxHp = 100;
         MaxATK = 10;
@@ -47,7 +49,7 @@ public class MagicCore{
     protected int pointUsedCount;     //当前使用过的节点个数
     protected int paceCount;          //当前走过的路径数目
 
-    protected SkillTool skillTool = new SkillTool();    //技能工具
+    protected SkillTool skillTool;    //技能工具
 
     protected List<Point> mPoint;     //节点列表
     protected List<Line> mLine;       //边列表
@@ -80,8 +82,7 @@ public class MagicCore{
         {
             if (instance == null)
             {
-                instance =new MagicCore();
-                Debug.Log("shilighua");
+                instance = new MagicCore();
             }
             return instance;
         }
@@ -115,6 +116,7 @@ public class MagicCore{
             if (getSuitRoute(pc, s.skillDoType).Count != 0)
             {
                 s.useable = true;
+                //Debug.Log(getSuitRoute(pc, s.skillDoType)[0] + " " + getSuitRoute(pc, s.skillDoType)[1]);
             }
             else
             {
@@ -127,17 +129,20 @@ public class MagicCore{
     List<int> getSuitRoute(List<PointColor> pc, SkillDoType sdt)
     {
         List<int> subRoute = new List<int>();
-        List<PointColor> require = new List<PointColor>();
-        foreach (PointColor p in pc)
-        {
-            require.Add(p);
-        }
+        
 
         //首先正序判断一次=======================================================================================================
         if (sdt == SkillDoType.oneWay || sdt == SkillDoType.twoWay)
         {
             int subRstart = -1;
             int subRend = -1;
+            int subRmid = -1;
+
+            List<PointColor> require = new List<PointColor>();
+            foreach (PointColor p in pc)
+            {
+                require.Add(p);
+            }
 
             //找到开始节点
             for (int i = 0; i < mRoute.Count; ++i)
@@ -148,26 +153,27 @@ public class MagicCore{
                 {
                     subRstart = i;
                     require.RemoveAt(0);
+                    subRmid = subRstart;
                 }
             }
-            if (subRstart != -1)    //如果找到，才继续
+            if (subRmid != -1)    //如果找到，才继续
             {
-
+                
                 //依次判断中间节点
-                for (int i = subRstart; i < mRoute.Count; ++i)
+                for (int i = subRmid; i < mRoute.Count; ++i)
                 {
                     if (require.Count == 1) //如果所有中间节点已经处理完毕
                         break;
                     if (mPoint[mRoute[i].pEnd].color == require[0] && !mPoint[mRoute[i].pEnd].isBroken)
                     {
-                        subRstart = i;
+                        subRmid = i;
                         require.RemoveAt(0);
                     }
                 }
                 if (require.Count == 1)  //如果中间点都满足，才继续
                 {
                     //判断终点
-                    for (int i = subRstart + 1; i < mRoute.Count; ++i)
+                    for (int i = subRmid + 1; i < mRoute.Count; ++i)
                     {
                         if (mPoint[mRoute[i].pEnd].color == require[0] && !mPoint[mRoute[i].pEnd].isBroken)
                         {
@@ -185,11 +191,18 @@ public class MagicCore{
             }
         }
 
-        //给可以倒叙的一次机会判断下倒叙=======================================================================================================
+        //给可以倒叙的一次机会判断下倒序=======================================================================================================
         if (sdt == SkillDoType.twoWay)
         {
             int subRstart = -1;
             int subRend = -1;
+            int subRmid = -1;
+
+            List<PointColor> require = new List<PointColor>();
+            foreach (PointColor p in pc)
+            {
+                require.Add(p);
+            }
 
             //找到开始节点
             for (int i = 0; i < mRoute.Count; ++i)
@@ -200,21 +213,22 @@ public class MagicCore{
                 {
                     subRstart = i;
                     require.RemoveAt(require.Count - 1);
+                    subRmid = subRstart;
                 }
             }
-            if (subRstart == -1)    //如果没找到，就直接退出
+            if (subRmid == -1)    //如果没找到，就直接退出
             {
                 return subRoute;
             }
 
             //依次判断中间节点
-            for (int i = subRstart; i < mRoute.Count; ++i)
+            for (int i = subRmid; i < mRoute.Count; ++i)
             {
                 if (require.Count == 1) //如果所有中间节点已经处理完毕
                     break;
                 if (mPoint[mRoute[i].pEnd].color == require[require.Count - 1] && !mPoint[mRoute[i].pEnd].isBroken)
                 {
-                    subRstart = i;
+                    subRmid = i;
                     require.RemoveAt(require.Count - 1);
                 }
             }
@@ -224,7 +238,7 @@ public class MagicCore{
             }
 
             //判断终点
-            for (int i = subRstart + 1; i < mRoute.Count; ++i)
+            for (int i = subRmid + 1; i < mRoute.Count; ++i)
             {
                 if (mPoint[mRoute[i].pEnd].color == require[require.Count - 1] && !mPoint[mRoute[i].pEnd].isBroken)
                 {
@@ -237,9 +251,18 @@ public class MagicCore{
             }
 
             //判断是否要添加
-            if (subRoute.Count == 2 && subRend - subRstart > subRoute[1] - subRoute[0])
+            if (subRoute.Count == 2)
             {
-                subRoute.Clear();
+                if (subRend - subRstart > subRoute[1] - subRoute[0])
+                {
+                    subRoute.Clear();
+                    subRoute.Add(subRstart);
+                    subRoute.Add(subRend);
+                    subRoute.Add(1);
+                }
+            }
+            else
+            {
                 subRoute.Add(subRstart);
                 subRoute.Add(subRend);
                 subRoute.Add(1);
@@ -257,6 +280,12 @@ public class MagicCore{
                 int pS = -1;
                 int pE = -1;
 
+                List<PointColor> require = new List<PointColor>();
+                foreach (PointColor p in pc)
+                {
+                    require.Add(p);
+                }
+
                 //找头
                 for (int i = 0; i < mRoute.Count; ++i)
                 {
@@ -265,7 +294,10 @@ public class MagicCore{
                         {
                             require.RemoveAt(j);
                             pS = i;
+                            break;
                         }
+                    if (pS != -1)
+                        break;
                 }
                 //找尾
                 for (int i = mRoute.Count - 1; i >= 0; --i)
@@ -275,8 +307,12 @@ public class MagicCore{
                         {
                             require.RemoveAt(j);
                             pE = i;
+                            break;
                         }
+                    if (pE != -1)
+                        break;
                 }
+               
                 if (pS != -1 && pE != -1 && pE >= pS && require.Count > 0) //如果找到了合适的头尾点,并且还需要判断中间点
                 {
                     //识别中间点
@@ -294,6 +330,7 @@ public class MagicCore{
                         uoS = pS;
                         uoE = pE;
                         isPos = 0;
+                        
                     }
                 }
             }
@@ -303,6 +340,12 @@ public class MagicCore{
                 int pS = -1;
                 int pE = -1;
 
+                List<PointColor> require = new List<PointColor>();
+                foreach (PointColor p in pc)
+                {
+                    require.Add(p);
+                }
+
                 //找尾
                 for (int i = mRoute.Count - 1; i >= 0; --i)
                 {
@@ -311,7 +354,10 @@ public class MagicCore{
                         {
                             require.RemoveAt(j);
                             pE = i;
+                            break;
                         }
+                    if (pE != -1)
+                        break;
                 }
                 //找头
                 for (int i = 0; i < mRoute.Count; ++i)
@@ -321,7 +367,10 @@ public class MagicCore{
                         {
                             require.RemoveAt(j);
                             pS = i;
+                            break;
                         }
+                    if (pS != -1)
+                        break;
                 }
                 if (pS != -1 && pE != -1 && pE >= pS && require.Count > 0) //如果找到了合适的头尾点,并且还需要判断中间点
                 {
@@ -403,18 +452,18 @@ public class MagicCore{
         //判断方向
         if (RStart == REnd) //如果只有一个节点
         {
-            mPoint[mRoute[REnd].pEnd].magic -= pr[pr.Count];
+            mPoint[mRoute[REnd].pEnd].magic -= pr[pr.Count - 1];
             mPoint[mRoute[REnd].pEnd].magic -= 1;
         }
         //如果是正序
-        if (isPos == 0)
+        else if (isPos == 0)
         {
             //释放末尾和开头
             mPoint[mRoute[REnd].pEnd].magic -= pr[pr.Count - 1];
             mPoint[mRoute[REnd].pEnd].magic -= 1;
             pc.RemoveAt(pc.Count - 1);
             pr.RemoveAt(pr.Count - 1);
-            
+
 
             mPoint[mRoute[RStart].pEnd].magic -= pr[0];
             mPoint[mRoute[RStart].pEnd].magic -= 1;
@@ -547,7 +596,7 @@ public class MagicCore{
     void initMonsterAttack()
     {
         mMonsterAttack.Clear(); // 清空
-        for(int mCount = 0;mCount < mMonster.Count;++mCount)
+        for (int mCount = 0; mCount < mMonster.Count; ++mCount)
         {
             Monster m = mMonster[mCount];
             if (m.monsterHP > 0)
@@ -571,10 +620,10 @@ public class MagicCore{
                     }
                     mMonsterAttack.Add(ed);
                 }
-                
+
             }
         }
-        
+
     }
 
     void freshMonsterAttack()
@@ -584,7 +633,7 @@ public class MagicCore{
             Monster m = mMonster[mCount];
             if (m.monsterHP <= 0)
             {
-                
+
                 int power = m.attackValue;
                 foreach (EDamage ed in mMonsterAttack)
                 {
@@ -605,12 +654,324 @@ public class MagicCore{
         }
     }
 
+    public int getMonsterPower(int id)
+    {
+        return mMonster[id].attackValue;
+    }
+
+    public void doDamage(int dam,int sorce)
+    {
+        Hp -= dam;
+        if (Hp <= 0)
+        {
+            //游戏结束
+        }
+
+        //执行受到伤害事件
+    }
+
+    void doDefenceEvent(int p, List<int> sorce)
+    {
+        Defen d = new Defen();
+        d.plID = p;
+        foreach (int i in sorce)
+        {
+            Debug.Log(buffList.Count);
+            d.sorce = i;
+            doBuff(d);
+        }
+    }
+
+    void doSkill()
+    {
+        //释放技能
+        skillReady.skill.beforeDo(ref skillReady);
+        skillReady.skill.skillDo(ref skillReady);
+        skillReady.skill.useable = false;
+        //释放技能效果
+        if (skillReady.skill.power > 0)
+        {
+            
+            doBuff(skillReady, BuffType.sBuffAttack);
+        }
+        //消耗魔力
+        cosumeMagic(skillReady);
+        detectPointBroken();
+        //刷新怪物攻击
+        freshMonsterAttack();
+        //清空路径
+        pointUsedCount += skillReady.magicRoute[1] - skillReady.magicRoute[0] + 1;
+        //改变点击状态
+        cf = ClickFlag.normal;
+    }
+
+    void TurnBuff()
+    {
+        for (int i = 0; i < buffList.Count; ++i)
+        {
+            BuffBasic b = buffList[i];
+            if (b.GetType() == typeof(Buff))
+            {
+                Buff buff = (Buff)buffList[i];
+                if (!buff.time)
+                {
+                    if(buff.turn < 100)
+                        buff.turn -= 1;
+                    if (buff.turn <= 0)
+                    {
+                        buffList.RemoveAt(i);
+                        --i;
+                    }
+;                }
+            }
+        }
+    }
+
+    void TimeBuff(BuffBasic b)
+    {
+        if (b.GetType() == typeof(Buff))
+        {
+            Buff buff = (Buff)b;
+            if (buff.time)
+            {
+                if(buff.turn < 100)
+                    buff.turn -= 1;
+            }
+        }
+    }
+
+    void removeTimeBuff()
+    {
+        for (int i = 0; i < buffList.Count; ++i)
+        {
+            BuffBasic b = buffList[i];
+            if (b.GetType() == typeof(Buff))
+            {
+                Buff buff = (Buff)b;
+                if (buff.time && buff.turn <= 0)
+                {
+                    buffList.RemoveAt(i);
+                    --i;
+                }
+            }
+        }
+    }
+
+    //事件管理器
+    /// <summary>
+    /// 执行无需输入条件的buff
+    /// </summary>
+    void doBuff(BuffType bt)
+    {
+        foreach (BuffBasic buff in buffList)
+        {
+            if (buff.type == bt && buff.turn > 0)
+            {
+                if (buff.maxCount > 0)
+                {
+                    buff.count++;
+                    if (buff.count == buff.maxCount)
+                    {
+                        buff.NE();
+                        buff.count = 0;
+                        TimeBuff(buff);
+                    }
+                }
+                else
+                    buff.NE();
+            }
+        }
+        removeTimeBuff();
+    }
+
+    void doBuff(BuffType bt, int pID)
+    {
+        foreach (BuffBasic buff in mPoint[pID].buff)
+        {
+            if (buff.type == bt && buff.turn > 0)
+            {
+                if (buff.maxCount > 0)
+                {
+                    buff.count++;
+                    if (buff.count == buff.maxCount)
+                    {
+                        buff.NE();
+                        buff.count = 0;
+                    }
+                }
+                else
+                    buff.NE();
+            }
+        }
+        removeTimeBuff();
+    }
+
+    void doBuff(Move m)
+    {
+        foreach (BuffBasic buff in buffList)
+        {
+            if (buff.type == BuffType.sBuffMove && buff.turn > 0)
+            {
+                if (buff.maxCount > 0)
+                {
+                    buff.count++;
+                    if (buff.count == buff.maxCount)
+                    {
+                        buff.ME(m);
+                        buff.count = 0;
+                    }
+                }
+                else
+                    buff.ME(m);
+            }
+        }
+        removeTimeBuff();
+    }
+
+    void doBuff(Move m,int pID)
+    {
+        foreach (BuffBasic buff in mPoint[pID].buff)
+        {
+            if (buff.type == BuffType.pBuffMoveIn && buff.turn > 0)
+            {
+                if (buff.maxCount > 0)
+                {
+                    buff.count++;
+                    if (buff.count == buff.maxCount)
+                    {
+                        buff.ME(m);
+                        buff.count = 0;
+                    }
+                }
+                else
+                    buff.ME(m);
+            }
+        }
+        removeTimeBuff();
+    }
+
+    void doBuff(Magic m,BuffType bt)
+    {
+        foreach (BuffBasic buff in buffList)
+        {
+            if (buff.type == bt && buff.turn > 0)
+            {
+                if (buff.maxCount > 0)
+                {
+                    buff.count++;
+                    if (buff.count == buff.maxCount)
+                    {
+                        buff.SE(ref m);
+                        buff.count = 0;
+                    }
+                }
+                else
+                    buff.SE(ref m);
+            }
+            
+        }
+        removeTimeBuff();
+    }
+
+    void doBuff(Magic m, int pID)
+    {
+        foreach (BuffBasic buff in mPoint[pID].buff)
+        {
+            if (buff.type == BuffType.pBuffSkill && buff.turn > 0)
+            {
+                if (buff.maxCount > 0)
+                {
+                    buff.count++;
+                    if (buff.count == buff.maxCount)
+                    {
+                        buff.SE(ref m);
+                        buff.count = 0;
+                    }
+                }
+                else
+                    buff.SE(ref m);
+            }
+        }
+        removeTimeBuff();
+    }
+
+    void doBuff(Damage d)
+    {
+        foreach (BuffBasic buff in buffList)
+        {
+            if (buff.type == BuffType.sBuffDamage && buff.turn > 0)
+            {
+                if (buff.maxCount > 0)
+                {
+                    buff.count++;
+                    if (buff.count == buff.maxCount)
+                    {
+                        buff.DE(d);
+                        buff.count = 0;
+                    }
+                }
+                else
+                    buff.DE(d);
+            }
+        }
+        removeTimeBuff();
+    }
+
+    void doBuff(Defen d)
+    {
+        foreach (BuffBasic buff in buffList)
+        {
+            if (buff.type == BuffType.sBuffDefence && buff.turn > 0)
+            {
+                if (buff.maxCount > 0)
+                {
+                    buff.count++;
+                    if (buff.count == buff.maxCount)
+                    {
+                        buff.DFE(d);
+                        buff.count = 0;
+                    }
+                }
+                else
+                    buff.DFE(d);
+            }
+        }
+        removeTimeBuff();
+    }
+
     //操作接口
     public void doAttackToMonster(int monsterID, int count, int damage)
     {
         for (int i = 0; i < count; ++i)
         {
             mMonster[monsterID].getDamage(damage);
+        }
+    }
+
+    public void doAOEToMonster(int count, int damage)
+    {
+        foreach (Monster m in mMonster)
+        {
+            if (m.monsterHP > 0)
+            {
+                for (int i = 0;  i < count; ++i)
+                    m.getDamage(damage);
+            }
+        }
+    }
+
+    public void doRandomToMonster(int count, int damage)
+    {
+        for (int i = 0; i < count; ++i)
+        {
+            List<int> aLiveM = new List<int>();
+            for (int m = 0; m < mMonster.Count; ++m)
+            {
+                if (isMonsterLive(m))
+                    aLiveM.Add(m);
+            }
+            int damTarget = aLiveM[Random.Range(0, aLiveM.Count - 1)];
+            mMonster[damTarget].getDamage(damage);
         }
     }
 
@@ -623,46 +984,50 @@ public class MagicCore{
                 int mATK = ed.damage;
                 int i = ed.ID;
 
-                if (mLine[i].def > mATK)
+                int p1M = -1, p2M = -1;
+                if (mPoint[mLine[i].p1].isDefence && !mPoint[mLine[i].p1].isBroken)
                 {
-                    //消耗防御力
-                    mLine[i].def -= mATK;
+                    p1M = mPoint[mLine[i].p1].magic;
+                }
+                if (mPoint[mLine[i].p2].isDefence && !mPoint[mLine[i].p2].isBroken)
+                {
+                    p2M = mPoint[mLine[i].p2].magic;
+                }
+
+                if (p1M == -1 && p2M == -1)
+                {
+                    //伤害事件
+                    foreach (int s in ed.sorce)
+                    {
+                        doDamage(mMonster[s].attackValue, s);
+                    }
+                    //执行伤害事件
+
+                }
+                else if (p1M > p2M)
+                {
+                    mPoint[mLine[i].p1].magic -= 1;
+                    doDefenceEvent(mLine[i].p1, ed.sorce);
+                }
+                else if (p1M < p2M)
+                {
+                    mPoint[mLine[i].p2].magic -= 1;
+                    doDefenceEvent(mLine[i].p2, ed.sorce);
                 }
                 else
                 {
-                    int p1M = -1, p2M = -1;
-                    if (mPoint[mLine[i].p1].isDefence && !mPoint[mLine[i].p1].isBroken)
-                    {
-                        p1M = mPoint[mLine[i].p1].magic;
-                    }
-                    if (mPoint[mLine[i].p2].isDefence && !mPoint[mLine[i].p2].isBroken)
-                    {
-                        p2M = mPoint[mLine[i].p2].magic;
-                    }
-
-                    if (p1M == -1 && p2M == -1)
-                    {
-                        int dam = mATK - mLine[i].def;
-                        Hp -= dam;
-
-                        //执行伤害事件
-                    }
-                    else if (p1M > p2M)
+                    if (mPoint[mLine[i].p1].color == PointColor.black)
                     {
                         mPoint[mLine[i].p1].magic -= 1;
-                    }
-                    else if (p1M < p2M)
-                    {
-                        mPoint[mLine[i].p2].magic -= 1;
+                        doDefenceEvent(mLine[i].p1, ed.sorce);
                     }
                     else
                     {
-                        if (mPoint[mLine[i].p1].color == PointColor.black)
-                            mPoint[mLine[i].p1].magic -= 1;
-                        else
-                            mPoint[mLine[i].p2].magic -= 1;
+                        mPoint[mLine[i].p2].magic -= 1;
+                        doDefenceEvent(mLine[i].p2, ed.sorce);
                     }
                 }
+
             }
         }
 
@@ -762,28 +1127,16 @@ public class MagicCore{
             Skill s = mSkill[skillNum];
             if (s.useable == true)
             {
-
-
                 skillReady.skill = s;               //保存准备释放的技能对象
                 skillReady.magicRoute = getSuitRoute(s.mRequire, s.skillDoType);   //获取技能的子路径
 
-                if (s.skillType != SkillType.allE || s.skillType != SkillType.randomE || s.skillType != SkillType.self)
+                if (s.skillType != SkillType.allE && s.skillType != SkillType.randomE && s.skillType != SkillType.self)
                 {
                     cf = ClickFlag.target;              //选择对象
                 }
                 else
                 {
-                    //释放技能
-                    skillReady.skill.beforeDo(ref skillReady);
-                    skillReady.skill.skillDo(ref skillReady);
-                    //消耗魔力
-                    s.useable = false;
-                    cosumeMagic(skillReady);
-                    detectPointBroken();
-                    //刷新怪物攻击
-                    freshMonsterAttack();
-                    //统计变化
-                    pointUsedCount += skillReady.magicRoute[1] - skillReady.magicRoute[0] + 1;
+                    doSkill();
                 }
             }
 
@@ -795,19 +1148,7 @@ public class MagicCore{
         if (cf == ClickFlag.target)       //设定目标完成，释放法术
         {
             skillReady.target = monsterID;
-            //释放技能
-            //skillReady.skill.beforeDo(ref skillReady);
-            skillReady.skill.skillDo(ref skillReady);
-            skillReady.skill.useable = false;
-            //消耗魔力
-            cosumeMagic(skillReady);
-            detectPointBroken();
-            //刷新怪物攻击
-            freshMonsterAttack();
-            //清空路径
-            pointUsedCount += skillReady.magicRoute[1] - skillReady.magicRoute[0] + 1;
-            //改变点击状态
-            cf = ClickFlag.normal;
+            doSkill();
         }
     }
 
@@ -906,30 +1247,11 @@ public class MagicCore{
             case BuffType.pBuffBroken:
                 mPoint[pl].buff.Add(buff);
                 break;
-            case BuffType.pBuffAttack:
-                mPoint[pl].buff.Add(buff);
-                break;
-            case BuffType.pBuffDefence:
-                mPoint[pl].buff.Add(buff);
-                break;
             case BuffType.pBuffMoveIn:
-                mPoint[pl].buff.Add(buff);
-                break;
-            case BuffType.pBuffMoveOut:
                 mPoint[pl].buff.Add(buff);
                 break;
             case BuffType.pBuffSkill:
                 mPoint[pl].buff.Add(buff);
-                break;
-
-            case BuffType.lBuffDamage:
-                mLine[pl].buff.Add(buff);
-                break;
-            case BuffType.lBuffDefence:
-                mLine[pl].buff.Add(buff);
-                break;
-            case BuffType.lBuffPass:
-                mLine[pl].buff.Add(buff);
                 break;
 
             case BuffType.sBuffDamage:
@@ -950,16 +1272,12 @@ public class MagicCore{
             case BuffType.sBuffTurnEnd:
                 buffList.Add(buff);
                 break;
-        }
-    }
-
-    public void addLineDefence(int lineID, int def)
-    {
-        if (lineID != -1)
-        {
-            Line l = mLine[lineID];
-            l.def += def;
-            mLine[lineID] = l;
+            case BuffType.sBuffDefence:
+                buffList.Add(buff);
+                break;
+            case BuffType.sBuffAttack:
+                buffList.Add(buff);
+                break;
         }
     }
 
@@ -969,9 +1287,11 @@ public class MagicCore{
         doDefence();
 
         cf = ClickFlag.normal;
+
         //回合开始========================================
         ATK = MaxATK;
         DEF = MaxDEF;
+        ++turn;
 
         //存入初始路径
         Move m;
@@ -993,6 +1313,13 @@ public class MagicCore{
         initMonsterAttack();
 
         //执行开始事件
+        if(turn == 1)
+            doBuff(BuffType.sBuffStart);
+
+        doBuff(BuffType.sBuffTurn);
+
+        //计算buff
+        TurnBuff();
 
         //刷新怪物攻击
         freshMonsterAttack();
@@ -1012,7 +1339,6 @@ public class MagicCore{
         {
             Line l = mLine[i];
             l.isPassed = false;
-            l.def = 0;
             mLine[i] = l;
         }
 
@@ -1045,6 +1371,10 @@ public class MagicCore{
                 buffList.RemoveAt(i);
             }
         }
+
+        //清除计数器
+        turn = 0;
+        
 
         //清除怪物列表
         mMonster.Clear();
@@ -1239,13 +1569,13 @@ public class MagicCore{
         p = new Point(6, PointColor.black, PointType.normal, 2, new List<int> { 5, 10, 11, 21, 22 });
         r.Add(p);
 
-        p = new Point(7, PointColor.red, PointType.normal, 0, new List<int> { 12, 13, 30, 31 });
+        p = new Point(7, PointColor.red, PointType.normal, 3, new List<int> { 12, 13, 30, 31 });
         r.Add(p);
 
-        p = new Point(8, PointColor.yellow, PointType.normal, 0, new List<int> { 14, 15, 25, 26 });
+        p = new Point(8, PointColor.yellow, PointType.normal, 3, new List<int> { 14, 15, 25, 26 });
         r.Add(p);
 
-        p = new Point(9, PointColor.blue, PointType.normal, 0, new List<int> { 16, 17, 23, 33 });
+        p = new Point(9, PointColor.blue, PointType.normal, 3, new List<int> { 16, 17, 23, 33 });
         r.Add(p);
 
         p = new Point(10, PointColor.red, PointType.normal, 0, new List<int> { 16, 17, 23, 33 });

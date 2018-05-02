@@ -40,18 +40,17 @@ namespace RouteOfTheMagic
 
     public enum SkillName
     {
-        魔力放射 = 0,
-        魔法飞弹 = 1,
-        火球术 = 2,
-        火焰风暴 = 3,
-        爆裂魔弹 = 4,
-        火焰路径 = 5,
-        一触即发 = 6,
-        超频 = 7,
-        燃烧潜能 = 8,
-        愤怒 = 9,
-        炽热之血 = 10,
-        融甲术 = 11,
+        魔法飞弹 = 0,
+        火球术 = 1,
+        火焰风暴 = 2,
+        火焰缠绕 = 3,
+        一触即发 = 4,
+        超频 = 5,
+        燃烧潜能 = 6,
+        愤怒 = 7,
+        炽热之血 = 8,
+        融甲术 = 9,
+        电光火石 = 10,
         count
     };
 
@@ -69,6 +68,8 @@ namespace RouteOfTheMagic
     {
         ATK下降 = 0,
         火焰路径 = 1,
+        燃烧潜能 = 2,
+        炽热之血 = 3,
         count
     }
 
@@ -80,22 +81,17 @@ namespace RouteOfTheMagic
     public enum BuffType
     {
         pBuffMoveIn = 0,
-        pBuffMoveOut = 1,
-        pBuffSkill = 2,
-        pBuffAttack = 3,
-        pBuffDefence = 4,
-        pBuffBroken = 5,
+        pBuffSkill = 1,
+        pBuffBroken = 2,
 
-        lBuffPass = 6,
-        lBuffDamage = 7,
-        lBuffDefence = 8,
-
-        sBuffStart = 9,
-        sBuffTurn = 10,
-        sBuffTurnEnd = 11,
-        sBuffSkill = 12,
-        sBuffDamage = 13,
-        sBuffMove = 14,
+        sBuffStart = 3,
+        sBuffTurn = 4,
+        sBuffTurnEnd = 5,
+        sBuffSkill = 6,
+        sBuffDamage = 7,
+        sBuffMove = 8,
+        sBuffDefence = 9,
+        sBuffAttack = 10,
    
         count
 
@@ -181,7 +177,6 @@ namespace RouteOfTheMagic
 
             isUnpassable = false;
             isPassed = false;
-            def = 0;
         }
 
         public int roateID;
@@ -190,9 +185,6 @@ namespace RouteOfTheMagic
         //状态
         public bool isUnpassable;   //不能通过么
         public bool isPassed;     //这回合已经走过了么
-        public int def;         //这个路径的护盾值
-
-        public List<BuffBasic> buff;
     };
 
     /// <summary>
@@ -200,7 +192,7 @@ namespace RouteOfTheMagic
     /// </summary>
     public class Skill
     {
-        public Skill(int i,SkillName sm,List<PointColor> lr,List<int> lrp,SkillType st,SkillDoType sdt,float p,float b)
+        public Skill(int i,SkillName sm,List<PointColor> lr,List<int> lrp,SkillType st,SkillDoType sdt,float p,float b,int c)
         {
             id = i;
             name = sm;
@@ -209,6 +201,7 @@ namespace RouteOfTheMagic
             skillType = st;
             power = p;
             basic = b;
+            count = c;
             skillDoType = sdt;
 
             useable = false;
@@ -226,6 +219,7 @@ namespace RouteOfTheMagic
 
         public float power;                 //伤害倍率
         public float basic;                 //基础伤害值
+        public int count;                   //发动次数
 
         public List<Move> subRoute;         //本次技能的执行路径
 
@@ -240,9 +234,9 @@ namespace RouteOfTheMagic
     public class BuffBasic
     {
         public BuffType type;
-        public int turn;
-        public int count;
-        public int maxCount;
+        public int turn;          //回合数
+        public int count;         
+        public int maxCount;      
 
         public NaiveEvent NE;
         public MoveEvent ME;
@@ -254,17 +248,18 @@ namespace RouteOfTheMagic
     public class Buff:BuffBasic
     {
 
-        public Buff(BuffName bn, int c, BuffType bt,int max)
+        public Buff(BuffName bn, int c, BuffType bt,int max,bool isTime)
         {
             name = bn;
             turn = c;
             type = bt;
             maxCount = max;
             count = 0;
+            time = isTime;
         }
 
         public BuffName name;
-      
+        public bool time;    //技能的有效期是按照回合计算还是使用次数计算
     }
 
     public class ItemBuff:BuffBasic
@@ -298,6 +293,7 @@ namespace RouteOfTheMagic
         public List<int> magicRoute;  //释放法术时的执行路径
         public Skill skill;             //技能id
         public int target;            //法术的执行对象
+        public int Damage;            //造成的伤害
     };
 
     /// <summary>
@@ -307,6 +303,15 @@ namespace RouteOfTheMagic
     {
         public int dam;                //单次攻击的伤害
         public int dRasour;            //伤害来源
+    }
+
+    /// <summary>
+    /// 防御事件
+    /// </summary>
+    public struct Defen
+    {
+        public int sorce;              //伤害源
+        public int plID;               //防御节点的编号，如果是边防御则为-1
     }
 
     public class EDamage
@@ -335,7 +340,7 @@ namespace RouteOfTheMagic
     /// </summary>
     /// <param name="SorceID"></param>
     /// <param name="Core"></param>
-    public delegate void DefenceEvent(int SorceID,int p,int l);
+    public delegate void DefenceEvent(Defen defen);
 
     /// <summary>
     /// 释放技能的事件
@@ -343,6 +348,12 @@ namespace RouteOfTheMagic
     /// <param name="magic"></param>
     /// <param name="Core"></param>
     public delegate void SkillEvent(ref Magic magic);
+
+    /// <summary>
+    /// 对怪物造成伤害时的技能
+    /// </summary>
+    /// <param name="magic"></param>
+    public delegate void AttackEvent(ref Magic magic);
 
     /// <summary>
     /// 不需要触发参数的事件
