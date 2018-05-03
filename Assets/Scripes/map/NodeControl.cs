@@ -56,7 +56,6 @@ public class NodeControl : MonoBehaviour {
     }
     void OnMouseDown()
     {
-        magic.setFlag(ClickFlag.upgrade);
-        magic.LclickP(int.Parse(this.tag));
+       
     }
 }
