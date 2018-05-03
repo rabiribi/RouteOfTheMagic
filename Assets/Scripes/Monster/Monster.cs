@@ -178,6 +178,10 @@ namespace RouteOfTheMagic
             /// </summary>
             DownDodgeValue = 5,
             /// <summary>
+            /// The taunt.
+            /// </summary>
+            Taunt = 6,
+            /// <summary>
             /// Damage x 1.5
             /// </summary>
             EasilyInjured = 10,
@@ -189,6 +193,7 @@ namespace RouteOfTheMagic
             /// The weak.
             /// </summary>
             Weak = 12,
+
         }
 
         /// <summary>
@@ -312,11 +317,11 @@ namespace RouteOfTheMagic
             {
                 if(buffList[i].buffType == BuffType.MinusHP)
                 {
-                    getDamage(buffList[i].buffValue);
+                    getDamage((int)buffList[i].buffValue);
                 }
                 if(buffList[i].buffType == BuffType.AddHP)
                 {
-                    restoreMonsterHP(buffList[i].buffValue);
+                    restoreMonsterHP((int)buffList[i].buffValue);
                 }
             }
         }
@@ -324,10 +329,12 @@ namespace RouteOfTheMagic
         /// <summary>
         /// Adds the buff.
         /// </summary>
+        /// <param name="buffID">Buff identifier.</param>
         /// <param name="buffTypeNum">Buff type number.</param>
         /// <param name="buffLastTypeNum">Buff last type number.</param>
         /// <param name="buffTime">Buff time.</param>
         /// <param name="tempBuffValue">Temp buff value.</param>
+        /// <param name="buffOverlapType">Buff overlap type.</param>
         public void addBuff(int buffID, int buffTypeNum, int buffLastTypeNum, int buffTime, int tempBuffValue, int buffOverlapType)
         {
             buff tempbuff = new buff(buffID,
@@ -349,6 +356,75 @@ namespace RouteOfTheMagic
                 }
             }
             buffList.Add(tempbuff);
+        }
+
+        /// <summary>
+        /// Gets the add buff identifier from magic core.
+        /// </summary>
+        /// <param name="buffid">Buffid.</param>
+        public void getAddBuffID(int buffid)
+        {
+            switch (buffid)
+            {
+                case 1: //伤害免疫50%
+                    addBuff(1, 11, 0, 1, 5, 1); 
+                    break;
+                case 2: //缓慢回复
+                    addBuff(2, 2, 1, 3, 5, 2);
+                    break;
+                case 3: //嘲讽
+                    addBuff(3, 6, 0, 1, 1, 1);
+                    break;
+                case 4: //增加攻击力
+                    addBuff(4, 0, 1, 3, 10, 2);
+                    break;
+                case 5: //降低攻击力
+                    addBuff(5, 1, 1, 3, 10, 2);
+                    break;
+                case 6: //流血、毒
+                    addBuff(6, 3, 1, 3, 5, 2);
+                    break;
+                case 7: //易伤
+                    addBuff(7, 10, 1, 3, 5, 1);
+                    break;
+                case 8: //虚弱
+                    addBuff(8, 12, 1, 3, 1, 1);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Checks the weak buff.
+        /// </summary>
+        /// <returns><c>true</c>, if weak buff was checked, <c>false</c> otherwise.</returns>
+        public bool checkWeakBuff()
+        {
+            for (int i = 0; i < buffList.Count; i++)
+            {
+                if(buffList[i].buffType == BuffType.Weak)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Checks the easily injured buff.
+        /// </summary>
+        /// <returns><c>true</c>, if easily injured buff was checked, <c>false</c> otherwise.</returns>
+        public bool checkEasilyInjuredBuff()
+        {
+            for (int i = 0; i < buffList.Count; i++)
+            {
+                if(buffList[i].buffType == BuffType.EasilyInjured)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>
@@ -390,11 +466,11 @@ namespace RouteOfTheMagic
             {
                 if(buffList[i].buffType == BuffType.DamagesImmunity)
                 {
-                    tempDamageValue *= (1-buffList[i].buffValue);
+                    tempDamageValue = (int)(tempDamageValue * 0.5f);
                 }
                 if(buffList[i].buffType == BuffType.EasilyInjured)
                 {
-                    tempDamageValue *= buffList[i].buffValue;
+                    tempDamageValue = (int)(tempDamageValue * 1.5f);
                 }
             }
             reduceMonsterHP(tempDamageValue);
