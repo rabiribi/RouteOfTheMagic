@@ -31,11 +31,6 @@ public class MagicCore {
 
     }
 
-    MagicCore(List<Line> lList, List<Point> pList)
-    {
-
-    }
-
     //全局参数
     protected int MaxHp;              //最大生命值
     protected int Hp;                 //当前HP
@@ -452,21 +447,29 @@ public class MagicCore {
         //判断方向
         if (RStart == REnd) //如果只有一个节点
         {
-            mPoint[mRoute[REnd].pEnd].magic -= pr[pr.Count - 1];
-            mPoint[mRoute[REnd].pEnd].magic -= 1;
+            if (!mPoint[mRoute[REnd].pEnd].isProtected)
+            {
+                mPoint[mRoute[REnd].pEnd].magic -= pr[pr.Count - 1];
+                mPoint[mRoute[REnd].pEnd].magic -= 1;
+            }
         }
         //如果是正序
         else if (isPos == 0)
         {
             //释放末尾和开头
-            mPoint[mRoute[REnd].pEnd].magic -= pr[pr.Count - 1];
-            mPoint[mRoute[REnd].pEnd].magic -= 1;
+            if (!mPoint[mRoute[REnd].pEnd].isProtected)
+            {
+                mPoint[mRoute[REnd].pEnd].magic -= pr[pr.Count - 1];
+                mPoint[mRoute[REnd].pEnd].magic -= 1;
+            }
             pc.RemoveAt(pc.Count - 1);
             pr.RemoveAt(pr.Count - 1);
 
-
-            mPoint[mRoute[RStart].pEnd].magic -= pr[0];
-            mPoint[mRoute[RStart].pEnd].magic -= 1;
+            if (!mPoint[mRoute[RStart].pEnd].isProtected)
+            {
+                mPoint[mRoute[RStart].pEnd].magic -= pr[0];
+                mPoint[mRoute[RStart].pEnd].magic -= 1;
+            }
             pc.RemoveAt(0);
             pr.RemoveAt(0);
 
@@ -477,14 +480,14 @@ public class MagicCore {
                 pcID = 0;
                 for (int i = RStart + 1; i < REnd; ++i)
                 {
-                    mPoint[mRoute[i].pEnd].magic -= 1;
+                    if (!mPoint[mRoute[i].pEnd].isProtected)
+                        mPoint[mRoute[i].pEnd].magic -= 1;
                     if (pc.Count != 0)
-                        if (mPoint[mRoute[i].pEnd].color == pc[pcID])
+                        if (pc.Count > pcID  && mPoint[mRoute[i].pEnd].color == pc[pcID])
                         {
-                            mPoint[mRoute[i].pEnd].magic -= pr[pcID];
+                            if (!mPoint[mRoute[i].pEnd].isProtected)
+                                mPoint[mRoute[i].pEnd].magic -= pr[pcID];
                             ++pcID;
-                            if (pcID == pc.Count)
-                                break;
                         }
                 }
             }
@@ -494,11 +497,13 @@ public class MagicCore {
                 {
                     for (int j = 0; j < pc.Count; ++j)
                     {
-                        mPoint[mRoute[i].pEnd].magic -= 1;
+                        if (!mPoint[mRoute[i].pEnd].isProtected)
+                            mPoint[mRoute[i].pEnd].magic -= 1;
                         if (pc.Count != 0)
                             if (mPoint[mRoute[i].pEnd].color == pc[j])
                             {
-                                mPoint[mRoute[i].pEnd].magic -= pr[j];
+                                if (!mPoint[mRoute[i].pEnd].isProtected)
+                                    mPoint[mRoute[i].pEnd].magic -= pr[j];
                                 pc.RemoveAt(j);
                                 pr.RemoveAt(j);
                                 --j;
@@ -510,13 +515,19 @@ public class MagicCore {
         else   //如果是倒序
         {
             //释放末尾和开头
-            mPoint[mRoute[REnd].pEnd].magic -= pr[pr.Count - 1];
-            mPoint[mRoute[REnd].pEnd].magic -= 1;
+            if (!mPoint[mRoute[REnd].pEnd].isProtected)
+            {
+                mPoint[mRoute[REnd].pEnd].magic -= pr[pr.Count - 1];
+                mPoint[mRoute[REnd].pEnd].magic -= 1;
+            }
             pc.RemoveAt(pc.Count - 1);
             pr.RemoveAt(pr.Count - 1);
 
-            mPoint[mRoute[RStart].pEnd].magic -= pr[0];
-            mPoint[mRoute[RStart].pEnd].magic -= 1;
+            if (!mPoint[mRoute[RStart].pEnd].isProtected)
+            {
+                mPoint[mRoute[RStart].pEnd].magic -= pr[0];
+                mPoint[mRoute[RStart].pEnd].magic -= 1;
+            }
             pc.RemoveAt(0);
             pr.RemoveAt(0);
 
@@ -526,14 +537,14 @@ public class MagicCore {
                 pcID = 0;
                 for (int i = RStart + 1; i < REnd; ++i)
                 {
-                    mPoint[mRoute[i].pEnd].magic -= 1;
+                    if (!mPoint[mRoute[i].pEnd].isProtected)
+                        mPoint[mRoute[i].pEnd].magic -= 1;
                     if (pc.Count != 0)
-                        if (mPoint[mRoute[i].pEnd].color == pc[pcID])
+                        if (pc.Count > pcID && mPoint[mRoute[i].pEnd].color == pc[pcID])
                         {
-                            mPoint[mRoute[i].pEnd].magic -= pr[pcID];
+                            if (!mPoint[mRoute[i].pEnd].isProtected)
+                                mPoint[mRoute[i].pEnd].magic -= pr[pcID];
                             ++pcID;
-                            if (pcID == pc.Count)
-                                break;
                         }
                 }
             }
@@ -543,11 +554,13 @@ public class MagicCore {
                 {
                     for (int j = 0; j < pc.Count; ++j)
                     {
-                        mPoint[mRoute[i].pEnd].magic -= 1;
+                        if (!mPoint[mRoute[i].pEnd].isProtected)
+                            mPoint[mRoute[i].pEnd].magic -= 1;
                         if (pc.Count != 0)
                             if (mPoint[mRoute[i].pEnd].color == pc[j])
                             {
-                                mPoint[mRoute[i].pEnd].magic -= pr[j];
+                                if (!mPoint[mRoute[i].pEnd].isProtected)
+                                    mPoint[mRoute[i].pEnd].magic -= pr[j];
                                 pc.RemoveAt(j);
                                 pr.RemoveAt(j);
                                 --j;
@@ -556,22 +569,13 @@ public class MagicCore {
                 }
             }
         }
-
-        //更新mRoute
-        for (int i = 0; i < REnd; ++i)
-        {
-            mRoute.RemoveAt(0);
-        }
-        Move move = mRoute[0];
-        move.pStart = move.pEnd;
-        move.moveLine = -1;
-        mRoute[0] = move;
     }
 
     void recoverMagic(int id)
     {
         //回复魔力
-        mPoint[id].magic += 1;
+        if(!mPoint[id].isProtected)
+            mPoint[id].magic += 1;
         if (mPoint[id].magic > mPoint[id].MaxMagic)
         {
             mPoint[id].magic = mPoint[id].MaxMagic;
@@ -684,6 +688,9 @@ public class MagicCore {
 
     void doSkill()
     {
+        //消耗魔力
+        cosumeMagic(skillReady);
+        detectPointBroken();
         //释放技能
         skillReady.skill.beforeDo(ref skillReady);
         skillReady.skill.skillDo(ref skillReady);
@@ -694,15 +701,22 @@ public class MagicCore {
             
             doBuff(skillReady, BuffType.sBuffAttack);
         }
-        //消耗魔力
-        cosumeMagic(skillReady);
-        detectPointBroken();
+        //更新mRoute
+        for (int i = 0; i < skillReady.magicRoute[1]; ++i)
+        {
+            mRoute.RemoveAt(0);
+        }
+        Move move = mRoute[0];
+        move.pStart = move.pEnd;
+        move.moveLine = -1;
+        mRoute[0] = move;
         //刷新怪物攻击
         freshMonsterAttack();
         //清空路径
         pointUsedCount += skillReady.magicRoute[1] - skillReady.magicRoute[0] + 1;
         //改变点击状态
-        cf = ClickFlag.normal;
+        if(cf == ClickFlag.target)
+            cf = ClickFlag.normal;
     }
 
     void TurnBuff()
@@ -981,7 +995,6 @@ public class MagicCore {
         {
             if (ed.damage != 0)
             {
-                int mATK = ed.damage;
                 int i = ed.ID;
 
                 int p1M = -1, p2M = -1;
@@ -997,37 +1010,55 @@ public class MagicCore {
                 if (p1M == -1 && p2M == -1)
                 {
                     //伤害事件
+                    
                     foreach (int s in ed.sorce)
                     {
                         doDamage(mMonster[s].attackValue, s);
+                        ed.sorce.Remove(s);
+                        ed.damage -= mMonster[s].attackValue;
+
+                        //执行伤害事件
+                        Damage d = new Damage();
+                        d.dam = mMonster[s].attackValue;
+                        d.dRasour = s;
+                        doBuff(d);
+                        if (ed.sorce.Count == 0)
+                            break;
                     }
-                    //执行伤害事件
 
                 }
                 else if (p1M > p2M)
                 {
-                    mPoint[mLine[i].p1].magic -= 1;
+                    if (!mPoint[mLine[i].p1].isProtected)
+                        mPoint[mLine[i].p1].magic -= 1;
+                    ed.damage = 0;
                     doDefenceEvent(mLine[i].p1, ed.sorce);
                 }
                 else if (p1M < p2M)
                 {
-                    mPoint[mLine[i].p2].magic -= 1;
+                    if (!mPoint[mLine[i].p2].isProtected)
+                        mPoint[mLine[i].p2].magic -= 1;
+                    ed.damage = 0;
                     doDefenceEvent(mLine[i].p2, ed.sorce);
                 }
                 else
                 {
                     if (mPoint[mLine[i].p1].color == PointColor.black)
                     {
-                        mPoint[mLine[i].p1].magic -= 1;
+                        if (!mPoint[mLine[i].p1].isProtected)
+                            mPoint[mLine[i].p1].magic -= 1;
+                        ed.damage = 0;
                         doDefenceEvent(mLine[i].p1, ed.sorce);
                     }
                     else
                     {
-                        mPoint[mLine[i].p2].magic -= 1;
+                        if (!mPoint[mLine[i].p2].isProtected)
+                            mPoint[mLine[i].p2].magic -= 1;
+                        ed.damage = 0;
                         doDefenceEvent(mLine[i].p2, ed.sorce);
                     }
                 }
-
+                ed.damage = 0;
             }
         }
 
@@ -1084,6 +1115,7 @@ public class MagicCore {
 
             FreshSkillActivity();
         }
+        //选择防御节点
         if (cf == ClickFlag.defencer)
         {
             if (!mPoint[locate].isBroken && (Adjacent(locate, mPos) != -1||locate == mPos) && DEF > 0)
@@ -1092,31 +1124,15 @@ public class MagicCore {
                 --DEF;
             }
         }
-        if (cf == ClickFlag.upgrade)
+        //保护节点
+        if (cf == ClickFlag.lockPoint)
         {
-            if(isPointUpgradable(locate))
-                pointUpgrade(locate);
+            if (!mPoint[locate].isBroken && !mPoint[locate].isProtected)
+            {
+                mPoint[locate].isProtected = true;
+                cf = ClickFlag.normal;
+            }
 
-        }
-        if (cf == ClickFlag.transToBlue)
-        {
-            if (isPointTransable(locate))
-                pointTrans(locate, PointColor.blue);
-        }
-        if (cf == ClickFlag.transToRed)
-        {
-            if (isPointTransable(locate))
-                pointTrans(locate, PointColor.red);
-        }
-        if (cf == ClickFlag.transToYellow)
-        {
-            if (isPointTransable(locate))
-                pointTrans(locate, PointColor.yellow);
-        }
-        if (cf == ClickFlag.TransToWhite)
-        {
-            if (isPointTransable(locate))
-                pointTrans(locate, PointColor.white);
         }
     }
 
@@ -1130,7 +1146,7 @@ public class MagicCore {
                 skillReady.skill = s;               //保存准备释放的技能对象
                 skillReady.magicRoute = getSuitRoute(s.mRequire, s.skillDoType);   //获取技能的子路径
 
-                if (s.skillType != SkillType.allE && s.skillType != SkillType.randomE && s.skillType != SkillType.self)
+                if (s.skillType == SkillType.singleE)
                 {
                     cf = ClickFlag.target;              //选择对象
                 }
@@ -1292,6 +1308,7 @@ public class MagicCore {
         ATK = MaxATK;
         DEF = MaxDEF;
         ++turn;
+        cf = ClickFlag.normal;
 
         //存入初始路径
         Move m;
@@ -1306,6 +1323,8 @@ public class MagicCore {
         foreach (Point p in mPoint)
         {
             p.isDefence = false;
+            p.isProtected = false;
+            p.isActivity = false;
         }
 
 
@@ -1360,6 +1379,28 @@ public class MagicCore {
         return mMonsterAttack;
     }
 
+    public void delectMonsterATK(int id)
+    {
+        List<int> edgeL = new List<int>();
+        foreach (EDamage ed in mMonsterAttack)
+        {
+            if (ed.damage != 0)
+            {
+                foreach (int i in ed.sorce)
+                {
+                    if (i == id)
+                        edgeL.Add(ed.ID);
+                }
+            }
+        }
+        
+        if (edgeL.Count > 0)
+        {
+            int deleteTarget = Random.Range(0, edgeL.Count - 1);
+            mMonsterAttack[edgeL[deleteTarget]].damage -= mMonster[id].attackValue;
+        }
+    }
+
     public void Victory()
     {
         //清除所有的战斗状态（不含道具）
@@ -1374,7 +1415,7 @@ public class MagicCore {
 
         //清除计数器
         turn = 0;
-        
+        cf = ClickFlag.inmap;
 
         //清除怪物列表
         mMonster.Clear();
@@ -1388,6 +1429,7 @@ public class MagicCore {
             p.isBroken = false;
             p.isDefence = false;
             p.isUnpassable = false;
+            p.isProtected = false;
             p.magic = p.MaxMagic;
         }
 
@@ -1725,7 +1767,7 @@ public class MagicCore {
     public bool isMonsterLive(int i)
     {
         bool r = false;
-        if (i < mMonster.Count)
+        if (i < mMonster.Count && i >= 0)
         {
             if (mMonster[i].monsterHP > 0)
                 r = true;
@@ -1749,7 +1791,7 @@ public class MagicCore {
     }
 
     /// <summary>
-    /// 节点可以升级么
+    /// 查询节点是否可以升级
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
@@ -1764,7 +1806,11 @@ public class MagicCore {
         return skillPoint >= need;
     }
 
-    //查询节点是否可以变质
+   /// <summary>
+   /// 查询节点是否可以变质
+   /// </summary>
+   /// <param name="id"></param>
+   /// <returns></returns>
     public bool isPointTransable(int id)
     {
         bool r = false;
@@ -1804,13 +1850,14 @@ public class MagicCore {
             }
             p.magic = p.MaxMagic;
         }
+        cf = ClickFlag.inmap;
     }
 
     /// <summary>
     /// 转化节点
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="pc"></param>
+    /// <param name="id"></param> 节点编号
+    /// <param name="pc"></param> 要转化的颜色
     public void pointTrans(int id, PointColor pc)
     {
         Point p = mPoint[id];

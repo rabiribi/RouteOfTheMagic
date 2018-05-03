@@ -20,10 +20,10 @@ public class SkillTool {
         Skill s = new Skill(0, SkillName.魔法飞弹, new List<PointColor> { PointColor.white, PointColor.white }, new List<int> { 0, 0 }, SkillType.singleE, SkillDoType.oneWay, 1.5f, 0,1);
         skillList.Add(s);
 
-        s = new Skill(1, SkillName.火球术, new List<PointColor> { PointColor.red, PointColor.white }, new List<int> { 0, 0 }, SkillType.singleE, SkillDoType.twoWay, 2.5f, 0,1);
+        s = new Skill(1, SkillName.火球术, new List<PointColor> { PointColor.red, PointColor.white }, new List<int> { 0, 1 }, SkillType.singleE, SkillDoType.twoWay, 2.5f, 0,1);
         skillList.Add(s);
 
-        s = new Skill(2, SkillName.火焰风暴, new List<PointColor> { PointColor.red, PointColor.white, PointColor.yellow }, new List<int> { 0, 0, 0 }, SkillType.allE, SkillDoType.twoWay, 1.0f, 0, 3);
+        s = new Skill(2, SkillName.火焰风暴, new List<PointColor> { PointColor.red, PointColor.white, PointColor.yellow }, new List<int> { 1, 1, 1 }, SkillType.allE, SkillDoType.twoWay, 1.0f, 0, 3);
         skillList.Add(s);
 
         s = new Skill(3, SkillName.火焰缠绕, new List<PointColor> { PointColor.red }, new List<int> { 1 }, SkillType.self, SkillDoType.single, 0.0f, 0,0);
@@ -47,15 +47,62 @@ public class SkillTool {
         skillList.Add(s);
 
         s = new Skill(8, SkillName.炽热之血, new List<PointColor> { PointColor.red, PointColor.white, PointColor.blue }, new List<int> { 0, 0, 0 }, SkillType.self, SkillDoType.unorder, 0.0f, 0,0);
-        s.skillDo += sS10;//加事件
+        s.skillDo += sS10;
         skillList.Add(s);
 
         s = new Skill(9, SkillName.融甲术, new List<PointColor> { PointColor.red, PointColor.white, PointColor.red }, new List<int> { 1, 1, 1 }, SkillType.singleE, SkillDoType.oneWay, 0.0f, 0,1);
-        //加事件
+ //=====加事件
         skillList.Add(s);
 
         s = new Skill(10, SkillName.电光火石, new List<PointColor> { PointColor.red, PointColor.yellow }, new List<int> { 0, 0 }, SkillType.singleE, SkillDoType.twoWay, 2.0f, 0,1);
         s.skillDo += quickAttack;
+        skillList.Add(s);
+
+        s = new Skill(11, SkillName.混沌魔弹, new List<PointColor> {  PointColor.red, PointColor.white,  PointColor.red }, new List<int> {  1, 2, 1 }, SkillType.singleE, SkillDoType.oneWay, 5.0f, 0, 1);
+        skillList.Add(s);
+
+        s = new Skill(12, SkillName.冰弹, new List<PointColor> { PointColor.blue, PointColor.white }, new List<int> { 1, 1 }, SkillType.singleE, SkillDoType.twoWay, 1.5f, 0, 1);
+        s.skillDo += iceBall;
+        skillList.Add(s);
+
+        s = new Skill(13, SkillName.碎冰甲, new List<PointColor> { PointColor.blue }, new List<int> { 1 }, SkillType.self, SkillDoType.single, 0, 0, 0);
+        s.skillDo += BrokenIceArmor;
+        skillList.Add(s);
+
+        s = new Skill(14, SkillName.冰封装甲, new List<PointColor> { PointColor.blue, PointColor.white }, new List<int> { 2, 1 }, SkillType.self, SkillDoType.twoWay, 0, 0, 0);
+        s.skillDo += FrostArmor;
+        skillList.Add(s);
+
+        s = new Skill(15, SkillName.毒雾, new List<PointColor> { PointColor.blue, PointColor.yellow }, new List<int> { 2, 1 }, SkillType.self, SkillDoType.twoWay, 0, 0, 0);
+//======加事件
+        skillList.Add(s);
+
+        s = new Skill(16, SkillName.冰风暴, new List<PointColor> { PointColor.blue, PointColor.white, PointColor.blue }, new List<int> { 0, 1, 0 }, SkillType.singleE, SkillDoType.single, 1.0f, 0, 3);
+//======加事件
+        skillList.Add(s);
+
+        s = new Skill(17, SkillName.暴风雪, new List<PointColor> { PointColor.blue, PointColor.white, PointColor.yellow }, new List<int> { 0, 0, 0 }, SkillType.allE, SkillDoType.twoWay, 0.5f, 0, 4);
+        s.skillDo += Bizzard;
+        skillList.Add(s);
+
+        s = new Skill(18, SkillName.毒弹, new List<PointColor> { PointColor.blue, PointColor.red }, new List<int> { 0, 0 }, SkillType.singleE, SkillDoType.twoWay, 2.5f, 0, 1);
+//======加事件
+        skillList.Add(s);
+
+        s = new Skill(19, SkillName.治疗术, new List<PointColor> { PointColor.white, PointColor.blue, PointColor.white }, new List<int> { 0, 0, 0 }, SkillType.self, SkillDoType.oneWay, 0, 0, 0);
+        s.skillDo += recover;
+        skillList.Add(s);
+
+        s = new Skill(20, SkillName.变形术, new List<PointColor> { PointColor.blue, PointColor.white}, new List<int> { 1, 0 }, SkillType.singleE, SkillDoType.twoWay, 0, 0, 0);
+        s.skillDo += transformer;
+        skillList.Add(s);
+
+        s = new Skill(21, SkillName.毒爆术, new List<PointColor> { PointColor.blue, PointColor.red, PointColor.white }, new List<int> { 0, 0, 0 }, SkillType.singleE, SkillDoType.unorder, 0, 0, 0);
+//======加事件
+        skillList.Add(s);
+
+        s = new Skill(22, SkillName.冰封节点, new List<PointColor> { PointColor.blue }, new List<int> { 1 }, SkillType.selfP, SkillDoType.single, 0, 0, 0);
+        s.skillDo += lockPoint;
         skillList.Add(s);
 
         foreach (Skill skill in skillList)
@@ -145,16 +192,100 @@ public class SkillTool {
         magicCore.addBuff(buffTool.getBuff(BuffName.炽热之血), -1);
     }
 
+    /// <summary>
+    /// 冰弹，消除敌人的一条攻击路径
+    /// </summary>
+    /// <param name="magic"></param>
+    void iceBall(ref Magic magic)
+    {
+        magicCore.delectMonsterATK(magic.target);
+    }
+
+    /// <summary>
+    /// 碎冰甲，格挡伤害/受到伤害时，随机消去一条敌人攻击路径
+    /// </summary>
+    /// <param name="magic"></param>
+    void BrokenIceArmor(ref Magic magic)
+    {
+        magicCore.addBuff(buffTool.getBuff(BuffName.碎冰甲D), -1);
+        magicCore.addBuff(buffTool.getBuff(BuffName.碎冰甲S), -1);
+    }
+
+    /// <summary>
+    /// 冰封装甲：为施法路径上的所有节点添加保护状态
+    /// </summary>
+    /// <param name="magic"></param>
+    void FrostArmor(ref Magic magic)
+    {
+        int pS = magic.magicRoute[0];
+        int pE = magic.magicRoute[1];
+
+        List<Move> route = magicCore.getRoute();
+        List<Point> plist = magicCore.getPoint();
+        for (int i = pS; i <= pE; ++i)
+        {
+            int pindex = route[i].pEnd;
+            plist[pindex].isProtected = true;
+        }
+    }
+
+    /// <summary>
+    /// 暴风雪：所有敌人的攻击路径减少2条
+    /// </summary>
+    /// <param name="magic"></param>
+    void Bizzard(ref Magic magic)
+    {
+        for (int i = 0; i < 5; ++i)
+        {
+            if (magicCore.isMonsterLive(i))
+            {
+                magicCore.delectMonsterATK(i);
+                magicCore.delectMonsterATK(i);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 治疗术：在接下来的5回合内，每回合回复5HP
+    /// </summary>
+    /// <param name="magic"></param>
+    void recover(ref Magic magic)
+    {
+        magicCore.addBuff(buffTool.getBuff(BuffName.恢复),-1);
+    }
+
+    /// <summary>
+    /// 变形术：删除目标的三个攻击判定
+    /// </summary>
+    /// <param name="magic"></param>
+    void transformer(ref Magic magic)
+    {
+        if (magicCore.isMonsterLive(magic.target))
+        {
+            magicCore.delectMonsterATK(magic.target);
+            magicCore.delectMonsterATK(magic.target);
+            magicCore.delectMonsterATK(magic.target);
+        }
+    }
+
+    /// <summary>
+    /// 电光火石 ： 立即获得3ATK
+    /// </summary>
+    /// <param name="magic"></param>
     void quickAttack(ref Magic magic)
     {
-        magicCore.setATK(magicCore.getATK() + 2);
+        magicCore.setATK(magicCore.getATK() + 3);
+    }
+
+    void lockPoint(ref Magic m)
+    {
+        magicCore.setFlag(ClickFlag.lockPoint);
     }
 
     public List<Skill> getInitSkills()
     {
         List<Skill> skill = new List<Skill>();
-        skill.Add(skillList[8]); //加一个魔法飞弹
-        skill.Add(skillList[10]);
+        skill.Add(skillList[22]); //加一个魔法飞弹
         return skill;
     }
 

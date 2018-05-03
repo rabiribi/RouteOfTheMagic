@@ -51,6 +51,37 @@ namespace RouteOfTheMagic
         炽热之血 = 8,
         融甲术 = 9,
         电光火石 = 10,
+        混沌魔弹 = 11,
+        冰弹 = 12,
+        碎冰甲 = 13,
+        冰封装甲 = 14,
+        毒雾 = 15,
+        冰风暴 = 16,
+        暴风雪 = 17,
+        毒弹 = 18,
+        治疗术 = 19,
+        变形术 = 20,
+        毒爆术 = 21,
+        冰封节点 = 22,
+        充能弹 = 23,
+        连锁闪电 = 24,
+        御风术 = 25,
+        传送 = 26,
+        蓄能电击 = 27,
+        静电体 = 28,
+        新星 = 29,
+        电容火花 = 30,
+        风暴前夕 = 31,
+        均衡之息 = 32,
+        节点修复 = 33,
+        超越未来 = 34,
+        三角攻击 = 35,
+        梦境窥探 = 36,
+        奥术护盾 = 37,
+        节点爆发 = 38,
+        重力 = 39,
+        黑暗剑 = 40,
+        混沌之盾 = 41,
         count
     };
 
@@ -70,6 +101,9 @@ namespace RouteOfTheMagic
         火焰路径 = 1,
         燃烧潜能 = 2,
         炽热之血 = 3,
+        碎冰甲D = 4,
+        碎冰甲S = 5,
+        恢复 = 6,
         count
     }
 
@@ -105,11 +139,8 @@ namespace RouteOfTheMagic
         normal = 0,                       //选择路径/选取技能
         defencer = 1,                     //选择防御节点
         target = 2,                       //选择施法对象
-        upgrade = 4,                      //要升级节点的时候
-        transToRed = 5,
-        transToBlue = 6,
-        transToYellow = 7,
-        TransToWhite = 8,
+        inmap = 3,                        //在地图上的状态
+        lockPoint = 4,                    //要施法冰封节点时的状态
         count
     };
 
@@ -145,6 +176,7 @@ namespace RouteOfTheMagic
             isBroken = false;
             isActivity = false;
             isDefence = false;
+            isProtected = false;
         }
 
         //节点属性
@@ -160,6 +192,7 @@ namespace RouteOfTheMagic
         public bool isBroken;           //坏了么
         public bool isActivity;         //位于激活状态么
         public bool isDefence;          //防御状态
+        public bool isProtected;        //节点保护状态
 
         public List<BuffBasic> buff;
     };

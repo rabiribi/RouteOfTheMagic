@@ -26,6 +26,19 @@ public class CharactorBuffTool {
         buff = new Buff(BuffName.炽热之血, 1, BuffType.sBuffAttack, -1,true);
         buff.SE += hotBlod;
         buffs.Add(buff);
+
+        buff = new Buff(BuffName.碎冰甲D, 1, BuffType.sBuffDefence, -1, false);
+        buff.DFE += brokenIceArmorD;
+        buffs.Add(buff);
+
+        buff = new Buff(BuffName.碎冰甲S, 1, BuffType.sBuffDamage, -1, false);
+        buff.DE += brokenIceArmorS;
+        buffs.Add(buff);
+
+        buff = new Buff(BuffName.恢复, 3, BuffType.sBuffTurn, -1, false);
+        buff.NE += Recover;
+        buffs.Add(buff);
+        
     }
 
     public Buff getBuff(BuffName bName)
@@ -76,6 +89,33 @@ public class CharactorBuffTool {
         if (!magic.isMonsterLive(m.target))
         {
             magic.setHP(magic.getHP() + m.Damage);
+        }
+    }
+
+    /// <summary>
+    /// 碎冰甲的防御被动：消去敌人一条攻击力
+    /// </summary>
+    /// <param name="d"></param>
+    void brokenIceArmorD(Defen d)
+    {
+        magic.delectMonsterATK(d.sorce);
+    }
+
+    /// <summary>
+    /// 碎冰甲被击中时的被动：消去敌人一条攻击力
+    /// </summary>
+    /// <param name="d"></param>
+    void brokenIceArmorS(Damage d)
+    {
+        magic.delectMonsterATK(d.dRasour);
+    }
+
+    void Recover()
+    {
+        magic.setHP(magic.getHP() + 5);
+        if (magic.getHP() > magic.getMaxHP())
+        {
+            magic.setHP(magic.getMaxHP());
         }
     }
 }
