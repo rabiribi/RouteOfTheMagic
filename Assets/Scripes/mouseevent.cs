@@ -15,7 +15,7 @@ public class mouseevent : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        magic = GameObject.Find("EventSystem").GetComponent<Clickcontrol>().magic;
+        magic = MagicCore.Instance;
         pList = magic.getPoint();
 
         pointStatus();

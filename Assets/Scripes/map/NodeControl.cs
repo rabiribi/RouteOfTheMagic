@@ -15,8 +15,9 @@ public class NodeControl : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        magic = GameObject.Find("EventSystem").GetComponent<Control>().magic;
-
+        //magic = GameObject.Find("EventSystem").GetComponent<Control>().magic;
+        //直接使用单例获取
+        magic = MagicCore.Instance;
         //判断状态,确定节点是否显示，以及其魔力值等
         if (magic.getPoint(int.Parse(this.tag)).MaxMagic == 0)
         {
@@ -27,8 +28,7 @@ public class NodeControl : MonoBehaviour {
             this.GetComponentInChildren<TextMesh>().text =magic.getPoint(int.Parse(this.tag)).MaxMagic.ToString();
         }
         //节点颜色初始化
-        this.GetComponent<SpriteRenderer>().color = toPointColor(magic.getPointColor(int.Parse(this.tag)));
-        
+        this.GetComponent<SpriteRenderer>().color = toPointColor(magic.getPointColor(int.Parse(this.tag)));    
     }
 
     public Color toPointColor(PointColor pointC)
@@ -54,5 +54,9 @@ public class NodeControl : MonoBehaviour {
         }
         return color;
     }
-
+    void OnMouseDown()
+    {
+        magic.setFlag(ClickFlag.upgrade);
+        magic.LclickP(int.Parse(this.tag));
+    }
 }

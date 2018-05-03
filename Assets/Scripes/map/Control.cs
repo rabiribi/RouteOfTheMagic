@@ -92,8 +92,6 @@ public class Control : MonoBehaviour {
             {
                 lineP.SetActive(true);
             }
-
-
         }
     }
     }
