@@ -11,6 +11,8 @@ public class Clickcontrol : MonoBehaviour {
     public MagicCore magic;
     public Monster monster;
     public GameObject node;
+    public GameObject nodes;
+    public GameObject lines;
     public GameObject linePerb;
     public GameObject monster0;
     public List<GameObject> skillList;
@@ -89,6 +91,7 @@ public class Clickcontrol : MonoBehaviour {
         
         //实例化
         instance=GameObject.Instantiate(instance, mPos,Quaternion.identity);
+        instance.transform.parent = nodes.transform;
         instance.tag = (int.Parse(instance.tag) + 1).ToString();
         instance.name = "Point" + instance.tag;
     }
@@ -131,6 +134,7 @@ public class Clickcontrol : MonoBehaviour {
            
 
             GameObject lineP = GameObject.Instantiate(linePerb);
+            lineP.transform.parent = lines.transform;
             lineP.SetActive(false);
             lineGameObjectlist.Add(lineP);
 
