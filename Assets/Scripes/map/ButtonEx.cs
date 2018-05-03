@@ -235,7 +235,7 @@ public class ButtonEx : UnityEngine.UI.Selectable,
         m_OnEnter.Invoke();
     }
 
-    private void Exit()
+    public void Exit()
     {
         if (!IsActive() || !isEnter)
             return;

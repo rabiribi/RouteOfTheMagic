@@ -245,7 +245,9 @@ namespace RouteOfTheMagic
                     
                     button.onClick.AddListener(delegate ()
                     {
+                        button.Exit();
                         this.buttonResponse(mapNode);
+                        
                     });
                     if (i == 0)
                     {
