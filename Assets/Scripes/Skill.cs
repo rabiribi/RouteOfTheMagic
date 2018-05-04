@@ -140,6 +140,13 @@ public class SkillTool {
         s.skillDo += StormComing;
         skillList.Add(s);
 
+        s = new Skill(32, SkillName.均衡之息, new List<PointColor> { PointColor.yellow, PointColor.blue }, new List<int> { 0, 0 }, SkillType.singleE, SkillDoType.twoWay, 2.5f, 0, 1);
+        s.skillDo += BalanceBreath;
+        skillList.Add(s);
+
+        s = new Skill(33, SkillName.火花魔术, new List<PointColor> { PointColor.yellow,  PointColor.red }, new List<int> { 0, 0 }, SkillType.self, SkillDoType.twoWay, 0, 0, 0);
+
+
         foreach (Skill skill in skillList)
         {
             skill.skillDo += doDamage;
@@ -400,7 +407,7 @@ public class SkillTool {
     void StormComing(ref Magic m)
     {
         magicCore.addBuff(buffTool.getBuff(BuffName.ATK上升), -1);
-        magicCore.addBuff(buffTool.getBuff(BuffName.附加伤害), -1);
+        magicCore.addBuff(buffTool.getBuff(BuffName.风暴前夕), -1);
 
         foreach (Point p in magicCore.getPoint())
         {
@@ -413,9 +420,32 @@ public class SkillTool {
         magicCore.setFlag(ClickFlag.endturn);
     }
 
+    /// <summary>
+    /// 电容火花 ： 下次技能的伤害倍率变为两倍
+    /// </summary>
+    /// <param name="m"></param>
     void capacitance(ref Magic m)
     {
         magicCore.addBuff(buffTool.getBuff(BuffName.电容火花), -1);
+    }
+
+    /// <summary>
+    /// 均衡之息，获得一点攻击和一点防御
+    /// </summary>
+    /// <param name="m"></param>
+    void BalanceBreath(ref Magic m)
+    {
+        magicCore.setDEF(magicCore.getDEF() + 1);
+        magicCore.setATK(magicCore.getATK() + 1);
+    }
+
+    /// <summary>
+    /// 火花魔术 ： 附加伤害效果
+    /// </summary>
+    /// <param name="m"></param>
+    void Flame(ref Magic m)
+    {
+        magicCore.addBuff(buffTool.getBuff(BuffName.附加伤害), -1);
     }
 
     public List<Skill> getInitSkills()
