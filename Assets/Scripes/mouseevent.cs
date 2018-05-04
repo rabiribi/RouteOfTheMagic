@@ -8,6 +8,8 @@ public class mouseevent : MonoBehaviour {
     // Use this for initialization
     [SerializeField]
     Sprite mySprite;
+    [SerializeField]
+    Sprite oldSprite;
     MagicCore magic;
     List<Point> pList;
     void Start () {
@@ -28,6 +30,7 @@ public class mouseevent : MonoBehaviour {
         {
             this.GetComponentInChildren<TextMesh>().text =
             magic.getPoint(int.Parse(this.tag)).magic + "/" + magic.getPoint(int.Parse(this.tag)).MaxMagic;
+            this.GetComponent<SpriteRenderer>().sprite = oldSprite;
         }
         //节点颜色初始化
         this.GetComponent<SpriteRenderer>().color = toPointColor(magic.getPointColor(int.Parse(this.tag)));

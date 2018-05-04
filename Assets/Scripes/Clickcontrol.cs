@@ -14,6 +14,7 @@ public class Clickcontrol : MonoBehaviour {
     public GameObject lines;
     public GameObject linePerb;
     public GameObject monster0;
+    public GameObject startButton;
     public List<GameObject> skillList;
     private GameObject instance;
     private GameObject btnGameObject;
@@ -56,6 +57,16 @@ public class Clickcontrol : MonoBehaviour {
 
         //检查线上的信息
         lineStatus();
+
+        //监听函数
+        if (magic.getFlag()==ClickFlag.defencer)
+        {
+            startButton.GetComponent<Image>().color = Color.green;
+        }
+        else
+        {
+            startButton.GetComponent<Image>().color = Color.red;
+        }
     }
     //初始化
     public void startinit()

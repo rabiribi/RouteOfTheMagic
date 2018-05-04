@@ -193,6 +193,7 @@ MonoBehaviour:
   lines: {fileID: 211688866}
   linePerb: {fileID: 1768600077517898, guid: 6af2a6018f7f0784c895ff16d8fefe1e, type: 2}
   monster0: {fileID: 231428580}
+  startButton: {fileID: 1009922775}
   skillList:
   - {fileID: 299655542}
   - {fileID: 1599150711}
