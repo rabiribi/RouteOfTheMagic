@@ -62,6 +62,8 @@ public class Control : MonoBehaviour {
         //实例化
         instance = GameObject.Instantiate(instance, mPos, Quaternion.identity);
         instance.transform.parent = nodes.transform;
+        instance.transform.localPosition = mPos;
+        instance.transform.localScale = new Vector3(3, 3, 3);
         instance.tag = (int.Parse(instance.tag) + 1).ToString();
         instance.name = "Point" + instance.tag;
     }
