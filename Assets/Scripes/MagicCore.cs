@@ -811,20 +811,6 @@ public class MagicCore {
         }
     }
 
-    void TimeBuff(BuffBasic b)
-    {
-        if (b.GetType() == typeof(Buff))
-        {
-            Buff buff = (Buff)b;
-            if (buff.time)
-            {
-                if(buff.turn < 100)
-                    buff.turn -= 1;
-                Debug.Log(buff.turn);
-            }
-        }
-    }
-
     void removeTimeBuff()
     {
         for (int i = 0; i < buffList.Count; ++i)
@@ -862,21 +848,9 @@ public class MagicCore {
         {
             if (buff.type == bt && buff.turn > 0)
             {
-                if (buff.maxCount > 0)
-                {
-                    buff.count++;
-                    if (buff.count == buff.maxCount)
-                    {
-                        buff.NE();
-                        buff.count = 0;
-                        TimeBuff(buff);
-                    }
-                }
-                else
-                {
-                    buff.NE();
-                    TimeBuff(buff);
-                }
+                skillTool.buffTool.doingBuff = buff;
+                buff.NE();
+                
             }
         }
         removeTimeBuff();
@@ -888,21 +862,9 @@ public class MagicCore {
         {
             if (buff.type == bt && buff.turn > 0)
             {
-                if (buff.maxCount > 0)
-                {
-                    buff.count++;
-                    if (buff.count == buff.maxCount)
-                    {
-                        buff.NE();
-                        buff.count = 0;
-                        TimeBuff(buff);
-                    }
-                }
-                else
-                {
-                    buff.NE();
-                    TimeBuff(buff);
-                }
+                skillTool.buffTool.doingBuff = buff;
+                buff.NE();
+                
             }
         }
         removeTimeBuff();
@@ -914,21 +876,9 @@ public class MagicCore {
         {
             if (buff.type == BuffType.sBuffMove && buff.turn > 0)
             {
-                if (buff.maxCount > 0)
-                {
-                    buff.count++;
-                    if (buff.count == buff.maxCount)
-                    {
-                        buff.ME(m);
-                        buff.count = 0;
-                        TimeBuff(buff);
-                    }
-                }
-                else
-                {
-                    buff.ME(m);
-                    TimeBuff(buff);
-                }
+                skillTool.buffTool.doingBuff = buff;
+                buff.ME(m);
+               
             }
         }
         removeTimeBuff();
@@ -940,21 +890,9 @@ public class MagicCore {
         {
             if (buff.type == BuffType.pBuffMoveIn && buff.turn > 0)
             {
-                if (buff.maxCount > 0)
-                {
-                    buff.count++;
-                    if (buff.count == buff.maxCount)
-                    {
-                        buff.ME(m);
-                        buff.count = 0;
-                        TimeBuff(buff);
-                    }
-                }
-                else
-                {
-                    buff.ME(m);
-                    TimeBuff(buff);
-                }
+                skillTool.buffTool.doingBuff = buff;
+                buff.ME(m);
+               
             }
         }
         removeTimeBuff();
@@ -966,21 +904,9 @@ public class MagicCore {
         {
             if (buff.type == bt && buff.turn > 0)
             {
-                if (buff.maxCount > 0)
-                {
-                    buff.count++;
-                    if (buff.count == buff.maxCount)
-                    {
-                        buff.SE(ref m);
-                        buff.count = 0;
-                        TimeBuff(buff);
-                    }
-                }
-                else
-                {
-                    buff.SE(ref m);
-                    TimeBuff(buff);
-                }
+                skillTool.buffTool.doingBuff = buff;
+                buff.SE(ref m);
+               
             }
             
         }
@@ -993,22 +919,10 @@ public class MagicCore {
         {
             if (buff.type == BuffType.pBuffSkill && buff.turn > 0)
             {
-                if (buff.maxCount > 0)
-                {
-                    buff.count++;
-                    if (buff.count == buff.maxCount)
-                    {
-                        buff.SE(ref m);
-                        buff.count = 0;
-                        TimeBuff(buff);
-                    }
-                }
-                else
-                {
-                    buff.SE(ref m);
-                    TimeBuff(buff);
-                }
-                }
+                skillTool.buffTool.doingBuff = buff;
+                buff.SE(ref m);
+               
+            }
         }
         removeTimeBuff();
     }
@@ -1019,21 +933,9 @@ public class MagicCore {
         {
             if (buff.type == BuffType.sBuffDamage && buff.turn > 0)
             {
-                if (buff.maxCount > 0)
-                {
-                    buff.count++;
-                    if (buff.count == buff.maxCount)
-                    {
-                        buff.DE(d);
-                        buff.count = 0;
-                        TimeBuff(buff);
-                    }
-                }
-                else
-                {
-                    buff.DE(d);
-                    TimeBuff(buff);
-                }
+                skillTool.buffTool.doingBuff = buff;
+                buff.DE(d);
+               
             }
         }
         removeTimeBuff();
@@ -1045,21 +947,9 @@ public class MagicCore {
         {
             if (buff.type == BuffType.sBuffDefence && buff.turn > 0)
             {
-                if (buff.maxCount > 0)
-                {
-                    buff.count++;
-                    if (buff.count == buff.maxCount)
-                    {
-                        buff.DFE(d);
-                        buff.count = 0;
-                        TimeBuff(buff);
-                    }
-                }
-                else
-                {
-                    buff.DFE(d);
-                    TimeBuff(buff);
-                }
+                skillTool.buffTool.doingBuff = buff;
+                buff.DFE(d);
+               
             }
         }
         removeTimeBuff();

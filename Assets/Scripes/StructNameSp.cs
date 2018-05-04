@@ -114,7 +114,8 @@ namespace RouteOfTheMagic
 
     public enum ItemName
     {
-
+        例子 = 0,
+        count
     }
 
     public enum BuffType

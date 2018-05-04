@@ -582,7 +582,7 @@ public class SkillTool {
     {
         List<Skill> skill = new List<Skill>();
         skill.Add(skillList[0]);
-        skill.Add(skillList[37]); //加一个魔法飞弹
+        skill.Add(skillList[30]); //加一个魔法飞弹
         return skill;
     }
 
