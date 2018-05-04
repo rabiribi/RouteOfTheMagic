@@ -38,7 +38,22 @@ public class CharactorBuffTool {
         buff = new Buff(BuffName.恢复, 3, BuffType.sBuffTurn, -1, false);
         buff.NE += Recover;
         buffs.Add(buff);
-        
+
+        buff = new Buff(BuffName.静电体, 1, BuffType.sBuffSkill, -1, false);
+        buff.SE += staticElectricity;
+        buffs.Add(buff);
+
+        buff = new Buff(BuffName.电容火花, 1, BuffType.sBuffSkill, -1, true);
+        buff.SE += capacititance;
+        buffs.Add(buff);
+
+        buff = new Buff(BuffName.ATK上升, 1, BuffType.sBuffTurn, -1, false);
+        buff.NE += ATKUp;
+        buffs.Add(buff);
+
+        buff = new Buff(BuffName.附加伤害, 2, BuffType.sBuffSkill, -1, false);
+        buff.SE += StormComming;
+        buffs.Add(buff);
     }
 
     public Buff getBuff(BuffName bName)
@@ -110,6 +125,9 @@ public class CharactorBuffTool {
         magic.delectMonsterATK(d.dRasour);
     }
 
+    /// <summary>
+    /// 恢复buff：回合开始时，恢复5HP
+    /// </summary>
     void Recover()
     {
         magic.setHP(magic.getHP() + 5);
@@ -117,5 +135,40 @@ public class CharactorBuffTool {
         {
             magic.setHP(magic.getMaxHP());
         }
+    }
+
+    /// <summary>
+    /// 静电体buff：每次释放技能时，恢复随机节点的魔力1点
+    /// </summary>
+    /// <param name="m"></param>
+    void staticElectricity(ref Magic m)
+    {
+        magic.recoverRandomPointMagic(1);
+    }
+
+    /// <summary>
+    /// 电容器，下次技能造成的伤害翻倍
+    /// </summary>
+    /// <param name="m"></param>
+    void capacititance(ref Magic m)
+    {
+        m.skill.addpower += m.skill.power;
+    }
+
+    /// <summary>
+    /// ATK加5
+    /// </summary>
+    void ATKUp()
+    {
+        magic.setATK(magic.getATK() + 5);
+    }
+
+    /// <summary>
+    /// 风暴前夕 ： 下回合提高所有技能的基础伤害8点 
+    /// </summary>
+    /// <param name="m"></param>
+    void StormComming(ref Magic m)
+    {
+        m.skill.addbasic += 8;
     }
 }

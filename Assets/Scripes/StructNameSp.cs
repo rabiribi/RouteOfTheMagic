@@ -73,10 +73,10 @@ namespace RouteOfTheMagic
         电容火花 = 30,
         风暴前夕 = 31,
         均衡之息 = 32,
-        节点修复 = 33,
-        超越未来 = 34,
-        三角攻击 = 35,
-        梦境窥探 = 36,
+        时空回溯 = 33,
+        节点修复 = 34,
+        超越未来 = 35,
+        三角攻击 = 36,
         奥术护盾 = 37,
         节点爆发 = 38,
         重力 = 39,
@@ -104,6 +104,10 @@ namespace RouteOfTheMagic
         碎冰甲D = 4,
         碎冰甲S = 5,
         恢复 = 6,
+        静电体 = 7,
+        电容火花 = 8,
+        ATK上升 = 9,
+        附加伤害 = 10,
         count
     }
 
@@ -141,6 +145,8 @@ namespace RouteOfTheMagic
         target = 2,                       //选择施法对象
         inmap = 3,                        //在地图上的状态
         lockPoint = 4,                    //要施法冰封节点时的状态
+        transport = 5,                    //要施法传送时的状态
+        endturn = 6,                      //强制回合结束
         count
     };
 
@@ -254,6 +260,12 @@ namespace RouteOfTheMagic
         public float basic;                 //基础伤害值
         public int count;                   //发动次数
 
+        public float addpower;              //buff提供的额外的攻击
+        public float addbasic;              //buff提供的额外的基础伤害
+        public int addcount;                //buff提供的额外的攻击次数
+
+        public int damage;                  //总伤害
+
         public List<Move> subRoute;         //本次技能的执行路径
 
         public bool useable;                //可以使用么
@@ -324,7 +336,7 @@ namespace RouteOfTheMagic
     public struct Magic
     {
         public List<int> magicRoute;  //释放法术时的执行路径
-        public Skill skill;             //技能id
+        public Skill skill;           //技能id
         public int target;            //法术的执行对象
         public int Damage;            //造成的伤害
     };

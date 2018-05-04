@@ -452,6 +452,10 @@ public class MagicCore {
                 mPoint[mRoute[REnd].pEnd].magic -= pr[pr.Count - 1];
                 mPoint[mRoute[REnd].pEnd].magic -= 1;
             }
+            else
+            {
+                mPoint[mRoute[REnd].pEnd].isProtected = false;
+            }
         }
         //如果是正序
         else if (isPos == 0)
@@ -462,6 +466,10 @@ public class MagicCore {
                 mPoint[mRoute[REnd].pEnd].magic -= pr[pr.Count - 1];
                 mPoint[mRoute[REnd].pEnd].magic -= 1;
             }
+            else
+            {
+                mPoint[mRoute[REnd].pEnd].isProtected = false;
+            }
             pc.RemoveAt(pc.Count - 1);
             pr.RemoveAt(pr.Count - 1);
 
@@ -469,6 +477,10 @@ public class MagicCore {
             {
                 mPoint[mRoute[RStart].pEnd].magic -= pr[0];
                 mPoint[mRoute[RStart].pEnd].magic -= 1;
+            }
+            else
+            {
+                mPoint[mRoute[REnd].pEnd].isProtected = false;
             }
             pc.RemoveAt(0);
             pr.RemoveAt(0);
@@ -487,6 +499,10 @@ public class MagicCore {
                         {
                             if (!mPoint[mRoute[i].pEnd].isProtected)
                                 mPoint[mRoute[i].pEnd].magic -= pr[pcID];
+                            else
+                            {
+                                mPoint[mRoute[REnd].pEnd].isProtected = false;
+                            }
                             ++pcID;
                         }
                 }
@@ -504,6 +520,10 @@ public class MagicCore {
                             {
                                 if (!mPoint[mRoute[i].pEnd].isProtected)
                                     mPoint[mRoute[i].pEnd].magic -= pr[j];
+                                else
+                                {
+                                    mPoint[mRoute[REnd].pEnd].isProtected = false;
+                                }
                                 pc.RemoveAt(j);
                                 pr.RemoveAt(j);
                                 --j;
@@ -517,19 +537,27 @@ public class MagicCore {
             //释放末尾和开头
             if (!mPoint[mRoute[REnd].pEnd].isProtected)
             {
-                mPoint[mRoute[REnd].pEnd].magic -= pr[pr.Count - 1];
+                mPoint[mRoute[REnd].pEnd].magic -= pr[0];
                 mPoint[mRoute[REnd].pEnd].magic -= 1;
             }
-            pc.RemoveAt(pc.Count - 1);
-            pr.RemoveAt(pr.Count - 1);
-
-            if (!mPoint[mRoute[RStart].pEnd].isProtected)
+            else
             {
-                mPoint[mRoute[RStart].pEnd].magic -= pr[0];
-                mPoint[mRoute[RStart].pEnd].magic -= 1;
+                mPoint[mRoute[REnd].pEnd].isProtected = false;
             }
             pc.RemoveAt(0);
             pr.RemoveAt(0);
+
+            if (!mPoint[mRoute[RStart].pEnd].isProtected)
+            {
+                mPoint[mRoute[RStart].pEnd].magic -= pr[pr.Count - 1];
+                mPoint[mRoute[RStart].pEnd].magic -= 1;
+            }
+            else
+            {
+                mPoint[mRoute[REnd].pEnd].isProtected = false;
+            }
+            pc.RemoveAt(pr.Count - 1);
+            pr.RemoveAt(pr.Count - 1);
 
             //如果不是无序就按顺序释放
             if (m.skill.skillDoType != SkillDoType.unorder)
@@ -544,6 +572,10 @@ public class MagicCore {
                         {
                             if (!mPoint[mRoute[i].pEnd].isProtected)
                                 mPoint[mRoute[i].pEnd].magic -= pr[pcID];
+                            else
+                            {
+                                mPoint[mRoute[REnd].pEnd].isProtected = false;
+                            }
                             ++pcID;
                         }
                 }
@@ -561,6 +593,10 @@ public class MagicCore {
                             {
                                 if (!mPoint[mRoute[i].pEnd].isProtected)
                                     mPoint[mRoute[i].pEnd].magic -= pr[j];
+                                else
+                                {
+                                    mPoint[mRoute[REnd].pEnd].isProtected = false;
+                                }
                                 pc.RemoveAt(j);
                                 pr.RemoveAt(j);
                                 --j;
@@ -691,25 +727,42 @@ public class MagicCore {
         //消耗魔力
         cosumeMagic(skillReady);
         detectPointBroken();
+        //执行释放技能事件
+        doBuff(skillReady, BuffType.sBuffSkill);
         //释放技能
+        for (int i = skillReady.magicRoute[0]; i < skillReady.magicRoute[1]; ++i)
+        {
+            mPoint[mRoute[i].pEnd].isActivity = false;
+        }
         skillReady.skill.beforeDo(ref skillReady);
         skillReady.skill.skillDo(ref skillReady);
         skillReady.skill.useable = false;
-        //释放技能效果
-        if (skillReady.skill.power > 0)
+        //释放技能攻击效果
+        if (skillReady.Damage > 0)
         {
-            
             doBuff(skillReady, BuffType.sBuffAttack);
         }
+        //更新技能状态
+        ++skillReady.skill.usedTime;
+        ++skillReady.skill.usedTimeTurn;
+        skillReady.skill.addbasic = 0;
+        skillReady.skill.addcount = 0;
+        skillReady.skill.addpower = 0;
         //更新mRoute
-        for (int i = 0; i < skillReady.magicRoute[1]; ++i)
+        for (int i = 0; i <= skillReady.magicRoute[1]; ++i)
         {
+            if (mRoute[0].moveLine != -1)
+                mLine[mRoute[0].moveLine].isPassed = false;
             mRoute.RemoveAt(0);
         }
-        Move move = mRoute[0];
-        move.pStart = move.pEnd;
-        move.moveLine = -1;
-        mRoute[0] = move;
+        if (mRoute.Count > 0)
+        {
+            Move move = mRoute[0];
+            move.pEnd = move.pStart;
+            mLine[move.moveLine].isPassed = false;
+            move.moveLine = -1;
+            mRoute[0] = move;
+        }
         //刷新怪物攻击
         freshMonsterAttack();
         //清空路径
@@ -717,6 +770,12 @@ public class MagicCore {
         //改变点击状态
         if(cf == ClickFlag.target)
             cf = ClickFlag.normal;
+        //强制结束攻击回合
+        if (cf == ClickFlag.endturn)
+        {
+            cf = ClickFlag.defencer;
+            endTurn();
+        }
     }
 
     void TurnBuff()
@@ -750,6 +809,7 @@ public class MagicCore {
             {
                 if(buff.turn < 100)
                     buff.turn -= 1;
+                Debug.Log(buff.turn);
             }
         }
     }
@@ -769,6 +829,16 @@ public class MagicCore {
                 }
             }
         }
+    }
+
+    public int getTurnSkillUsedCount()
+    {
+        int r = 0;
+        foreach (Skill skill in mSkill)
+        {
+            r += skill.usedTimeTurn;
+        }
+        return r;
     }
 
     //事件管理器
@@ -792,7 +862,10 @@ public class MagicCore {
                     }
                 }
                 else
+                {
                     buff.NE();
+                    TimeBuff(buff);
+                }
             }
         }
         removeTimeBuff();
@@ -811,10 +884,14 @@ public class MagicCore {
                     {
                         buff.NE();
                         buff.count = 0;
+                        TimeBuff(buff);
                     }
                 }
                 else
+                {
                     buff.NE();
+                    TimeBuff(buff);
+                }
             }
         }
         removeTimeBuff();
@@ -833,10 +910,14 @@ public class MagicCore {
                     {
                         buff.ME(m);
                         buff.count = 0;
+                        TimeBuff(buff);
                     }
                 }
                 else
+                {
                     buff.ME(m);
+                    TimeBuff(buff);
+                }
             }
         }
         removeTimeBuff();
@@ -855,10 +936,14 @@ public class MagicCore {
                     {
                         buff.ME(m);
                         buff.count = 0;
+                        TimeBuff(buff);
                     }
                 }
                 else
+                {
                     buff.ME(m);
+                    TimeBuff(buff);
+                }
             }
         }
         removeTimeBuff();
@@ -877,10 +962,14 @@ public class MagicCore {
                     {
                         buff.SE(ref m);
                         buff.count = 0;
+                        TimeBuff(buff);
                     }
                 }
                 else
+                {
                     buff.SE(ref m);
+                    TimeBuff(buff);
+                }
             }
             
         }
@@ -900,11 +989,15 @@ public class MagicCore {
                     {
                         buff.SE(ref m);
                         buff.count = 0;
+                        TimeBuff(buff);
                     }
                 }
                 else
+                {
                     buff.SE(ref m);
-            }
+                    TimeBuff(buff);
+                }
+                }
         }
         removeTimeBuff();
     }
@@ -922,10 +1015,14 @@ public class MagicCore {
                     {
                         buff.DE(d);
                         buff.count = 0;
+                        TimeBuff(buff);
                     }
                 }
                 else
+                {
                     buff.DE(d);
+                    TimeBuff(buff);
+                }
             }
         }
         removeTimeBuff();
@@ -944,10 +1041,14 @@ public class MagicCore {
                     {
                         buff.DFE(d);
                         buff.count = 0;
+                        TimeBuff(buff);
                     }
                 }
                 else
+                {
                     buff.DFE(d);
+                    TimeBuff(buff);
+                }
             }
         }
         removeTimeBuff();
@@ -1086,6 +1187,8 @@ public class MagicCore {
                     for (int i = 0; i <= Loc; ++i)
                     {
                         recoverMagic(mRoute[0].pEnd);
+                        if(mRoute[0].moveLine != -1)
+                            mLine[mRoute[0].moveLine].isPassed = false;
                         mRoute.RemoveAt(0);
                     }
 
@@ -1130,9 +1233,37 @@ public class MagicCore {
             if (!mPoint[locate].isBroken && !mPoint[locate].isProtected)
             {
                 mPoint[locate].isProtected = true;
+                mPoint[locate].magic = mPoint[locate].magic / 2 + mPoint[locate].magic % 2;
                 cf = ClickFlag.normal;
             }
 
+        }
+        //传送
+        if (cf == ClickFlag.transport)
+        {
+            if (!mPoint[locate].isBroken && locate != mPos)
+            {
+                if (mRoute.Count == 0)
+                {
+                    Move m = new Move();
+                    m.pStart = mPos;
+                    m.pEnd = mPos;
+                    m.moveLine = -1;
+                    mPoint[mPos].isActivity = true;
+                    mRoute.Add(m);
+                }
+                Move move = new Move();
+                move.pStart = mPos;
+                move.pEnd = locate;
+                move.moveLine = -1;
+                mPoint[locate].isActivity = true;
+                mPoint[locate].magic = mPoint[locate].MaxMagic;
+                mRoute.Add(move);
+
+                mPos = locate;
+                cf = ClickFlag.normal;
+            }
+           
         }
     }
 
@@ -1186,14 +1317,25 @@ public class MagicCore {
             p.isActivity = true;
             mPoint[locate] = p;
 
-            Line l = mLine[roadID];
-            l.isPassed = true;
-            mLine[roadID] = l;
-
             Move m;
-            m.pStart = mPos;
-            m.pEnd = locate;
-            m.moveLine = roadID;
+            if (mRoute.Count > 0 || DragDoc.Count > 0)
+            {
+                
+                m.pStart = mPos;
+                m.pEnd = locate;
+                m.moveLine = roadID;
+
+                Line l = mLine[roadID];
+                l.isPassed = true;
+                mLine[roadID] = l;
+
+            }
+            else
+            {
+                m.pStart = locate;
+                m.pEnd = locate;
+                m.moveLine = -1;
+            }
             DragDoc.Add(m);
 
             mPos = locate;
@@ -1327,6 +1469,11 @@ public class MagicCore {
             p.isActivity = false;
         }
 
+        foreach (Skill skill in mSkill)
+        {
+            skill.usedTimeTurn = 0;
+        }
+
 
         //生成怪物攻击
         initMonsterAttack();
@@ -1401,6 +1548,11 @@ public class MagicCore {
         }
     }
 
+    public void addMonsterBuff(int id, Monster.BuffType type, int count)
+    {
+        mMonster[id].getAddBuffID((int)type);
+    }
+
     public void Victory()
     {
         //清除所有的战斗状态（不含道具）
@@ -1444,7 +1596,24 @@ public class MagicCore {
         Money += 10;
     }
 
+    public void recoverRandomPointMagic(int n)
+    {
+        List<int> pCouldRecover = new List<int>();
+        for (int i = 0; i < mPoint.Count; ++i)
+        {
+            if (mPoint[i].magic < mPoint[i].MaxMagic && !mPoint[i].isBroken && !mPoint[i].isProtected)
+            {
+                pCouldRecover.Add(i);
+            }
+        }
 
+        int target = Random.Range(0, pCouldRecover.Count - 1);
+
+        for (int i = 0; i < n; ++i)
+        {
+            recoverMagic(pCouldRecover[target]);
+        }
+    }
 
     //查询接口
     public Point getPoint(int pNo)
