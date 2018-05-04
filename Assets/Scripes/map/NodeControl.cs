@@ -7,28 +7,43 @@ using RouteOfTheMagic;
 public class NodeControl : MonoBehaviour {
 
     MagicCore magic;
-
+    SpriteRenderer spriteRenderer;
+    TextMesh textMesh;
+    public GameObject[] child;
+    int id;
     // Use this for initialization
     void Start () {
-		
-	}
+        //直接使用单例获取
+        magic = MagicCore.Instance;
+        spriteRenderer = this.GetComponent<SpriteRenderer>();
+        textMesh = this.GetComponentInChildren<TextMesh>();
+        id= int.Parse(this.tag);
+    }
 	
 	// Update is called once per frame
 	void Update () {
-        //magic = GameObject.Find("EventSystem").GetComponent<Control>().magic;
-        //直接使用单例获取
-        magic = MagicCore.Instance;
         //判断状态,确定节点是否显示，以及其魔力值等
-        if (magic.getPoint(int.Parse(this.tag)).MaxMagic == 0)
+        if (magic.getPoint(id).MaxMagic == 0)
         {
-            this.GetComponent<SpriteRenderer>().sprite = null;
+            spriteRenderer.sprite = null;
         }
-        else if (!magic.getPointBroked(int.Parse(this.tag)))
+        else if (!magic.getPointBroked(id))
         {
-            this.GetComponentInChildren<TextMesh>().text =magic.getPoint(int.Parse(this.tag)).MaxMagic.ToString();
+            textMesh.text =magic.getPoint(id).MaxMagic.ToString();
         }
         //节点颜色初始化
-        this.GetComponent<SpriteRenderer>().color = toPointColor(magic.getPointColor(int.Parse(this.tag)));    
+        spriteRenderer.color = toPointColor(magic.getPointColor(id));
+       
+    }
+    private void LateUpdate()
+    {
+        if (child[0] && child[0].activeSelf && Input.GetMouseButtonUp(0))
+        {
+            foreach (var item in child)
+            {
+                item.gameObject.SetActive(false);
+            }
+        }
     }
 
     public Color toPointColor(PointColor pointC)
@@ -54,8 +69,37 @@ public class NodeControl : MonoBehaviour {
         }
         return color;
     }
+
+
     void OnMouseDown()
     {
-       
+        foreach (var item in child)
+        {
+            item.gameObject.SetActive(true);
+        }
     }
+    //鼠标抬起事件(基于碰撞体)
+    void OnMouseUp()
+    {
+        //magic.setFlag(ClickFlag.upgrade);
+      //  magic.LclickP(id);
+        
+    }
+    void OnMouseOver()
+    {
+
+        if (Input.GetMouseButtonUp(0) && magic.isPointUpgradable(id))
+        {
+            magic.pointUpgrade(id);
+        }
+    }
+    public void  PointChange(PointColor pc)
+    {
+        Debug.Log(magic.isPointTransable(id));
+        if (magic.isPointTransable(id))
+        {
+            magic.pointTrans(id, pc);
+        }
+    }
+
 }

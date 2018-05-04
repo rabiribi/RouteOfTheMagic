@@ -27,7 +27,7 @@ public class MagicCore {
         Hp = MaxHp;
         mPos = 0;
 
-        skillPoint = 3;
+        skillPoint = 100;
 
     }
 

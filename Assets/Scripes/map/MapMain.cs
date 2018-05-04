@@ -59,19 +59,47 @@ namespace RouteOfTheMagic
     }
 
     /// <summary>
-    /// 主地图生成绘制类
+    /// 主地图生成绘制类 接口SceneEnd，场景结束后调用
     /// </summary>
     public class MapMain : MonoBehaviour
     {
         //public List<List<MapNode>> map = new List<List<MapNode>>();
         public List<List<MapNode>> map = new List<List<MapNode>>();
         public GameObject mapRoot;
+        public GameObject[] Root;
         private UiRender render;
         public int layerCount = 5;
         public Sprite sprite;
-        public MagicCore magicCore;
-        // Use this for initialization
+        private MagicCore magicCore;
+        MapMain instance;
+        MapNode currentMapNode;
 
+        public MapMain Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    // 如果不存在实例, 则查找所有这个类型的对象
+                    if (instance == null)
+                    {
+                        // 如果没有找到， 则新建一个
+                        GameObject obj = new GameObject(this.name);
+                        // 对象不可见，不会被保存
+                        obj.hideFlags = HideFlags.HideAndDontSave;
+                        // 强制转换为 T 
+                        instance = obj.AddComponent<MapMain>();
+                    }
+                }
+                return instance;
+            }
+        }
+
+        // Use this for initialization
+        private void Awake()
+        {
+            instance = this;
+        }
         void Start()
         {
             magicCore = MagicCore.Instance;
@@ -277,10 +305,15 @@ namespace RouteOfTheMagic
         /// </summary>
         void buttonResponse(MapNode mapNode)
         {
-            if(mapNode.nodeType==NodeType.fight)
+            currentMapNode = mapNode;
+            if (mapNode.nodeType==NodeType.fight)
             {
                 SceneManager.LoadSceneAsync("Magic");
                 mapRoot.SetActive(false);
+                foreach (var item in Root)
+                {
+                    item.SetActive(false);
+                }
             }
             Debug.Log(mapNode.nodeType);
         }
@@ -310,8 +343,30 @@ namespace RouteOfTheMagic
             return button;
         }
         // Update is called once per frame
+
         void Update()
         {
+            if(Input.GetKeyDown(KeyCode.A))
+            {
+                SceneEnd(true);
+            }
+        }
+        /// <summary>
+        /// 场景功能结束后调用
+        /// </summary>
+        /// <param name="istrue">战斗是否胜利</param>
+        public void SceneEnd(bool istrue)
+        {
+            int layer = currentMapNode.layer;
+            if(istrue)
+                foreach (var item in currentMapNode.child)
+                {
+                    map[layer+1][item].FatherIsPass = true;
+                }
+            foreach (var item in Root)
+            {
+                item.SetActive(true);
+            }
 
         }
     }
