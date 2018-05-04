@@ -511,10 +511,10 @@ public class MagicCore {
             {
                 for (int i = RStart + 1; i < REnd; ++i)
                 {
+                    if (!mPoint[mRoute[i].pEnd].isProtected)
+                        mPoint[mRoute[i].pEnd].magic -= 1;
                     for (int j = 0; j < pc.Count; ++j)
                     {
-                        if (!mPoint[mRoute[i].pEnd].isProtected)
-                            mPoint[mRoute[i].pEnd].magic -= 1;
                         if (pc.Count != 0)
                             if (mPoint[mRoute[i].pEnd].color == pc[j])
                             {
@@ -526,7 +526,7 @@ public class MagicCore {
                                 }
                                 pc.RemoveAt(j);
                                 pr.RemoveAt(j);
-                                --j;
+                                break;
                             }
                     }
                 }
@@ -584,10 +584,10 @@ public class MagicCore {
             {
                 for (int i = RStart + 1; i < REnd; ++i)
                 {
+                    if (!mPoint[mRoute[i].pEnd].isProtected)
+                        mPoint[mRoute[i].pEnd].magic -= 1;
                     for (int j = 0; j < pc.Count; ++j)
                     {
-                        if (!mPoint[mRoute[i].pEnd].isProtected)
-                            mPoint[mRoute[i].pEnd].magic -= 1;
                         if (pc.Count != 0)
                             if (mPoint[mRoute[i].pEnd].color == pc[j])
                             {
@@ -599,7 +599,7 @@ public class MagicCore {
                                 }
                                 pc.RemoveAt(j);
                                 pr.RemoveAt(j);
-                                --j;
+                                break;
                             }
                     }
                 }
@@ -1196,6 +1196,7 @@ public class MagicCore {
                     {
                         Move m = mRoute[0];
                         m.pStart = m.pEnd;
+                        mLine[m.moveLine].isPassed = false;
                         m.moveLine = -1;
                         mRoute[0] = m;
                     }

@@ -51,8 +51,12 @@ public class CharactorBuffTool {
         buff.NE += ATKUp;
         buffs.Add(buff);
 
-        buff = new Buff(BuffName.附加伤害, 2, BuffType.sBuffSkill, -1, false);
+        buff = new Buff(BuffName.风暴前夕, 2, BuffType.sBuffSkill, -1, false);
         buff.SE += StormComming;
+        buffs.Add(buff);
+
+        buff = new Buff(BuffName.附加伤害, 1, BuffType.sBuffSkill, -1, false);
+        buff.SE += addBasic;
         buffs.Add(buff);
     }
 
@@ -170,5 +174,14 @@ public class CharactorBuffTool {
     void StormComming(ref Magic m)
     {
         m.skill.addbasic += 8;
+    }
+
+    /// <summary>
+    /// 附加伤害 ： 每次命中附加5点伤害
+    /// </summary>
+    /// <param name="m"></param>
+    void addBasic(ref Magic m)
+    {
+        m.skill.addbasic += 5;
     }
 }
