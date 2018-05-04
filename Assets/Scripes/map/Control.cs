@@ -84,6 +84,7 @@ public class Control : MonoBehaviour {
 
 
             GameObject lineP = GameObject.Instantiate(linePerb);
+            lineP.gameObject.layer = 8;
             lineP.transform.parent = lines.transform;
             lineP.SetActive(false);
             lineGameObjectlist.Add(lineP);

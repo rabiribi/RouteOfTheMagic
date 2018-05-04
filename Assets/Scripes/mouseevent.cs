@@ -60,8 +60,7 @@ public class mouseevent : MonoBehaviour {
     void OnMouseDown()
     {
         if (magic.getCurrentPos() == int.Parse(this.tag)&& magic.getFlag() == ClickFlag.normal)
-            Clickcontrol.isDrag = true;
-        
+            Clickcontrol.isDrag = true;     
     }
     //鼠标抬起事件(基于碰撞体)
     void OnMouseUp()
