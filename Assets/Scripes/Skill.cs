@@ -145,7 +145,36 @@ public class SkillTool {
         skillList.Add(s);
 
         s = new Skill(33, SkillName.火花魔术, new List<PointColor> { PointColor.yellow,  PointColor.red }, new List<int> { 0, 0 }, SkillType.self, SkillDoType.twoWay, 0, 0, 0);
+        s.skillDo += Flame;
+        skillList.Add(s);
 
+        s = new Skill(34, SkillName.节点修复, new List<PointColor> { PointColor.white, PointColor.blue, PointColor.white }, new List<int> { 2, 1, 2 }, SkillType.selfP, SkillDoType.oneWay, 0, 0, 0);
+        s.skillDo += fixPoint;
+        skillList.Add(s);
+
+        s = new Skill(35, SkillName.超越未来, new List<PointColor> {  }, new List<int> {  }, SkillType.self, SkillDoType.norequire, 0, 0, 0);
+        s.skillDo += OverFuture;
+        skillList.Add(s);
+
+        s = new Skill(36, SkillName.三角攻击, new List<PointColor> { PointColor.white, PointColor.white }, new List<int> { 0, 0 }, SkillType.singleE, SkillDoType.oneWay, 1.0f, 0, 1);
+        s.beforeDo += TiangleAttackB;
+        skillList.Add(s);
+
+        s = new Skill(37, SkillName.奥术护盾, new List<PointColor> { PointColor.black }, new List<int> { 0 }, SkillType.singleE, SkillDoType.single, 0, 0, 0);
+        s.skillDo += MagicShelden;
+        skillList.Add(s);
+
+        s = new Skill(38, SkillName.节点爆发, new List<PointColor> { }, new List<int> { }, SkillType.selfP, SkillDoType.norequire, 0, 0, 0);
+        s.skillDo += pointBomb;
+        skillList.Add(s);
+
+        s = new Skill(39, SkillName.重力, new List<PointColor> { PointColor.black, PointColor.black, PointColor.black, PointColor.black, PointColor.black }, new List<int> { 1, 1, 1, 1, 1 }, SkillType.singleE, SkillDoType.oneWay, 0, 0, 1);
+        s.beforeDo += Gravity;
+        skillList.Add(s);
+
+        s = new Skill(40, SkillName.黑暗剑, new List<PointColor> { PointColor.black, PointColor.black }, new List<int> { 0, 0 },SkillType.singleE,SkillDoType.oneWay, 1.0f, 0, 1);
+        s.beforeDo += DarkSword;
+        skillList.Add(s);
 
         foreach (Skill skill in skillList)
         {
@@ -448,11 +477,112 @@ public class SkillTool {
         magicCore.addBuff(buffTool.getBuff(BuffName.附加伤害), -1);
     }
 
+    /// <summary>
+    /// 节点修复 ： 修复节点，恢复最大魔力
+    /// </summary>
+    /// <param name="m"></param>
+    void fixPoint(ref Magic m)
+    {
+        magicCore.setFlag(ClickFlag.fixPoint);
+    }
+
+    /// <summary>
+    /// 修复所有节点并恢复至maxMP，将ATK恢复至MaxATK，,所有节点maxMP + 1，该技能使用一次后将被移除
+    /// </summary>
+    /// <param name="m"></param>
+    void OverFuture(ref Magic m)
+    {
+        magicCore.setATK(magicCore.getMaxATK());
+        foreach (Point p in magicCore.getPoint())
+        {
+            p.isBroken = false;
+            p.isProtected = false;
+            if (p.MaxMagic > 0)
+            {
+                ++p.MaxMagic;
+            }
+            p.magic = p.MaxMagic;
+        }
+        magicCore.removeSkill(SkillName.超越未来);
+    }
+
+    /// <summary>
+    /// 三角攻击：攻击前统计节点数量： 红提供威力 ，黄提供攻击次数， 蓝删除敌人攻击边, 白提供随机魔力恢复
+    /// </summary>
+    /// <param name="m"></param>
+    void TiangleAttackB(ref Magic m)
+    {
+        int pS = m.magicRoute[0];
+        int pE = m.magicRoute[1];
+
+        for (int i = pS; i <= pE; ++i)
+        {
+            PointColor pc = magicCore.getPoint(magicCore.getRoute()[i].pEnd).color;
+            switch (pc)
+            {
+                case PointColor.white:
+                    magicCore.recoverRandomPointMagic(1);
+                    break;
+                case PointColor.red:
+                    m.skill.addpower += 1.5f;
+                    break;
+                case PointColor.yellow:
+                    m.skill.addcount += 1;
+                    break;
+                case PointColor.blue:
+                    magicCore.delectMonsterATK();
+                    break;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 奥数护盾：为当前节点施加节点保护
+    /// </summary>
+    /// <param name="m"></param>
+    void MagicShelden(ref Magic m)
+    {
+        int pos = magicCore.getRoute()[m.magicRoute[0]].pEnd;
+        magicCore.getPoint(pos).isProtected = true;
+    }
+
+    /// <summary>
+    /// 节点爆破 ： 破坏节点，给与对方节点魔力值*5的伤害
+    /// </summary>
+    /// <param name="m"></param>
+    void pointBomb(ref Magic m)
+    {
+        int pos = magicCore.getRoute()[m.magicRoute[0]].pEnd;
+        magicCore.getPoint(pos).isProtected = false;
+
+        magicCore.doAttackToMonster(m.target, 1, magicCore.getPoint(pos).magic * 5);
+        magicCore.getPoint(pos).magic = -1;
+        magicCore.getPoint(pos).isBroken = true;
+    }
+
+    /// <summary>
+    /// 重力：伤害值为怪物当前生命值的40%
+    /// </summary>
+    /// <param name="m"></param>
+    void Gravity(ref Magic m)
+    {
+        m.skill.addbasic = magicCore.getMonsterMaxHp(m.target) * 0.4f;
+    }
+
+    /// <summary>
+    /// 黑暗剑 ： 每次提高微小的伤害
+    /// </summary>
+    /// <param name="m"></param>
+    void DarkSword(ref Magic m)
+    {
+        m.skill.power += 0.1f;
+    }
+
     public List<Skill> getInitSkills()
     {
         List<Skill> skill = new List<Skill>();
-        skill.Add(skillList[23]);
-        skill.Add(skillList[31]); //加一个魔法飞弹
+        skill.Add(skillList[0]);
+        skill.Add(skillList[37]); //加一个魔法飞弹
         return skill;
     }
 

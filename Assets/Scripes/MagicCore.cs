@@ -413,8 +413,8 @@ public class MagicCore {
         }
         if (sdt == SkillDoType.norequire)
         {
-            subRoute.Add(subRoute.Count - 1);
-            subRoute.Add(subRoute.Count - 1);
+            subRoute.Add(mRoute.Count - 1);
+            subRoute.Add(mRoute.Count - 1);
             subRoute.Add(0);
         }
 
@@ -442,6 +442,12 @@ public class MagicCore {
         for (int i = 0; i < RStart; ++i)
         {
             recoverMagic(mRoute[i].pEnd);
+        }
+
+        //如果没有要求，就啥都不做
+        if (m.skill.skillDoType == SkillDoType.norequire)
+        {
+            return;
         }
 
         //判断方向
@@ -697,6 +703,11 @@ public class MagicCore {
     public int getMonsterPower(int id)
     {
         return mMonster[id].attackValue;
+    }
+
+    public int getMonsterMaxHp(int id)
+    {
+        return mMonster[id].maxMonsterHP;
     }
 
     public void doDamage(int dam,int sorce)
@@ -1264,7 +1275,19 @@ public class MagicCore {
                 mPos = locate;
                 cf = ClickFlag.normal;
             }
-           
+        }
+
+        //节点修复
+        if (cf == ClickFlag.fixPoint)
+        {
+            if (mPoint[locate].magic < mPoint[locate].MaxMagic)
+            {
+                mPoint[locate].isBroken = false;
+                mPoint[locate].isProtected = false;
+                mPoint[locate].magic = mPoint[locate].MaxMagic;
+            }
+
+            cf = ClickFlag.normal;
         }
     }
 
@@ -1490,6 +1513,9 @@ public class MagicCore {
 
         //刷新怪物攻击
         freshMonsterAttack();
+
+        //刷新自己攻击
+        FreshSkillActivity();
     }
 
     public void endTurn()
@@ -1546,6 +1572,24 @@ public class MagicCore {
         {
             int deleteTarget = Random.Range(0, edgeL.Count - 1);
             mMonsterAttack[edgeL[deleteTarget]].damage -= mMonster[id].attackValue;
+        }
+    }
+
+    public void delectMonsterATK()
+    {
+        List<int> edgeL = new List<int>();
+        foreach (EDamage ed in mMonsterAttack)
+        {
+            if (ed.damage != 0)
+            {
+                edgeL.Add(ed.ID);
+            }
+        }
+
+        if (edgeL.Count > 0)
+        {
+            int deleteTarget = Random.Range(0, edgeL.Count - 1);
+            mMonsterAttack[edgeL[deleteTarget]].damage = 0;
         }
     }
 
@@ -1613,6 +1657,18 @@ public class MagicCore {
         for (int i = 0; i < n; ++i)
         {
             recoverMagic(pCouldRecover[target]);
+        }
+    }
+
+    public void removeSkill(SkillName sn)
+    {
+        foreach (Skill s in mSkill)
+        {
+            if (s.name == sn)
+            {
+                mSkill.Remove(s);
+                break;
+            }
         }
     }
 

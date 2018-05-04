@@ -156,7 +156,7 @@ public class CharactorBuffTool {
     /// <param name="m"></param>
     void capacititance(ref Magic m)
     {
-        m.skill.addpower += m.skill.power;
+        m.skill.addpower += m.skill.power + m.skill.addpower;
     }
 
     /// <summary>
