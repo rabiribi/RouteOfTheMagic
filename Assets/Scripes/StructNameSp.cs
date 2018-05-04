@@ -81,7 +81,6 @@ namespace RouteOfTheMagic
         节点爆发 = 38,
         重力 = 39,
         黑暗剑 = 40,
-        混沌之盾 = 41,
         count
     };
 
@@ -149,6 +148,7 @@ namespace RouteOfTheMagic
         lockPoint = 4,                    //要施法冰封节点时的状态
         transport = 5,                    //要施法传送时的状态
         endturn = 6,                      //强制回合结束
+        fixPoint = 7,                     //修复节点操作
         count
     };
 
