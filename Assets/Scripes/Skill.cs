@@ -30,7 +30,7 @@ public class SkillTool {
         s.skillDo += sS5;
         skillList.Add(s); 
 
-        s = new Skill(4, SkillName.一触即发, new List<PointColor> { PointColor.red, PointColor.white }, new List<int> { 0 , 0 }, SkillType.singleE, SkillDoType.oneWay, 5.0f, 0,1);
+        s = new Skill(4, SkillName.一触即发, new List<PointColor> { PointColor.red, PointColor.white }, new List<int> { 0 , 0 }, SkillType.singleE, SkillDoType.oneWay, 1.0f, 0,1);
         s.skillDo += beS6;
         skillList.Add(s);
 
@@ -42,7 +42,7 @@ public class SkillTool {
         s.skillDo += sS8;
         skillList.Add(s);
 
-        s = new Skill(7, SkillName.愤怒, new List<PointColor> { PointColor.red, PointColor.red }, new List<int> { 0, 0 }, SkillType.singleE, SkillDoType.oneWay, 1.0f, 0,1);
+        s = new Skill(7, SkillName.愤怒, new List<PointColor> { PointColor.red, PointColor.red }, new List<int> { 0, 0 }, SkillType.singleE, SkillDoType.oneWay, 0.0f, 0,1);
         s.beforeDo += beS9;
         skillList.Add(s);
 
@@ -105,6 +105,41 @@ public class SkillTool {
         s.skillDo += lockPoint;
         skillList.Add(s);
 
+        s = new Skill(23, SkillName.充能弹, new List<PointColor> { PointColor.yellow, PointColor.white }, new List<int> { 0, 0 }, SkillType.randomE, SkillDoType.twoWay, 0.5f, 0, 5);
+        skillList.Add(s);
+
+        s = new Skill(24, SkillName.连锁闪电 ,new List<PointColor> { PointColor.red, PointColor.white, PointColor.yellow }, new List<int> { 0, 1, 0 }, SkillType.randomE, SkillDoType.oneWay, 1.0f, 0, 3);
+        s.beforeDo += ThunderChain;
+        skillList.Add(s);
+
+        s = new Skill(25, SkillName.御风术, new List<PointColor> { PointColor.yellow }, new List<int> { 1 }, SkillType.self, SkillDoType.single, 0, 0, 0);
+        s.skillDo += windMaster;
+        skillList.Add(s);
+
+        s = new Skill(26, SkillName.传送, new List<PointColor> { PointColor.yellow, PointColor.white }, new List<int> { 1, 2 }, SkillType.selfP, SkillDoType.twoWay, 0, 0, 0);
+        s.skillDo += transport;
+        skillList.Add(s);
+
+        s = new Skill(27, SkillName.蓄能电击, new List<PointColor> { PointColor.yellow, PointColor.red }, new List<int> { 0, 0 }, SkillType.singleE, SkillDoType.twoWay, 2.0f, 0, 1);
+        s.beforeDo += accumulator;
+        skillList.Add(s);
+
+        s = new Skill(28, SkillName.静电体, new List<PointColor> { PointColor.yellow, PointColor.blue, PointColor.white }, new List<int> { 0, 0, 0 }, SkillType.self, SkillDoType.unorder, 0, 0, 0);
+        s.skillDo += staticElectricity;
+        skillList.Add(s);
+
+        s = new Skill(29, SkillName.新星, new List<PointColor> { PointColor.yellow, PointColor.yellow, PointColor.white }, new List<int> { 0, 0, 0 }, SkillType.allE, SkillDoType.unorder, 2.0f, 0, 0);
+        s.beforeDo += nova;
+        skillList.Add(s);
+
+        s = new Skill(30, SkillName.电容火花, new List<PointColor> { PointColor.yellow, PointColor.red }, new List<int> { 0, 0 }, SkillType.self, SkillDoType.twoWay, 0, 0, 0);
+        s.skillDo += capacitance;
+        skillList.Add(s);
+
+        s = new Skill(31, SkillName.风暴前夕, new List<PointColor> { PointColor.yellow, PointColor.yellow, PointColor.white, PointColor.red, PointColor.blue },new List<int> {0,0,1,0,0} ,SkillType.self, SkillDoType.unorder, 0, 0, 0 );
+        s.skillDo += StormComing;
+        skillList.Add(s);
+
         foreach (Skill skill in skillList)
         {
             skill.skillDo += doDamage;
@@ -119,7 +154,7 @@ public class SkillTool {
     }
 
     /// <summary>
-    /// 火焰缠绕：附加三回合的反伤buff，如果怪物死亡，回复节点魔力
+    /// 火焰缠绕：附加一回合的反伤buff，如果怪物死亡，回复节点魔力
     /// </summary>
     /// <param name="magic"></param>
     void sS5(ref Magic magic)
@@ -148,11 +183,7 @@ public class SkillTool {
         //如果当前回合数不为0，则将power变为1.5;
         if (t == 1)
         {
-            magic.skill.power = 5.0f;
-        }
-        else
-        {
-            magic.skill.power = 1.0f;
+            magic.skill.addpower = 4.0f;
         }
     }
 
@@ -180,7 +211,7 @@ public class SkillTool {
     /// <param name="magic"></param>
     void beS9(ref Magic magic)
     {
-        magic.skill.count = (int)((float)magicCore.getHP() / (float)magicCore.getMaxHP() * 10.0f);
+        magic.skill.addcount = (int)((float)magicCore.getHP() / (float)magicCore.getMaxHP() * 10.0f);
     }
 
     /// <summary>
@@ -199,6 +230,15 @@ public class SkillTool {
     void iceBall(ref Magic magic)
     {
         magicCore.delectMonsterATK(magic.target);
+    }
+
+    /// <summary>
+    /// 融甲术，给指定敌人99层易伤buff
+    /// </summary>
+    /// <param name="m"></param>
+    void meltArmor(ref Magic m)
+    {
+        
     }
 
     /// <summary>
@@ -277,15 +317,112 @@ public class SkillTool {
         magicCore.setATK(magicCore.getATK() + 3);
     }
 
+    /// <summary>
+    /// 冰封节点：消耗该节点一半的魔力，为所选节点添加保护状态
+    /// </summary>
+    /// <param name="m"></param>
     void lockPoint(ref Magic m)
     {
         magicCore.setFlag(ClickFlag.lockPoint);
     }
 
+    /// <summary>
+    /// 连锁闪电：如果场上的人数量大于2，count变为6
+    /// </summary>
+    /// <param name="m"></param>
+    void ThunderChain(ref Magic m)
+    {
+        int count = 0;
+        for (int i = 0; i <= 4; ++i)
+        {
+            if (magicCore.isMonsterLive(i))
+                ++count;
+        }
+        if (count >= 2)
+            m.skill.addcount = 3;
+    }
+
+    /// <summary>
+    /// 御风术: ATK增加当前节点魔力值 + 2
+    /// </summary>
+    /// <param name="m"></param>
+    void windMaster(ref Magic m)
+    {
+        magicCore.setATK(magicCore.getATK() + magicCore.getPoint(magicCore.getRoute()[m.magicRoute[1]].pEnd).magic + 2);
+    }
+
+    /// <summary>
+    /// 传送： 随意移动到任意节点，恢复该节点的全部魔力
+    /// </summary>
+    /// <param name="m"></param>
+    void transport(ref Magic m)
+    {
+        magicCore.setFlag(ClickFlag.transport);
+    }
+
+    /// <summary>
+    /// 蓄能电击 ： 攻击次数为该回合使用过的技能数 + 1
+    /// </summary>
+    /// <param name="m"></param>
+    void accumulator(ref Magic m)
+    {
+        m.skill.count = 1 + magicCore.getTurnSkillUsedCount();
+    }
+
+    /// <summary>
+    /// 静电体 ： 每次释放一个技能，恢复任意节点1点魔力
+    /// </summary>
+    /// <param name="m"></param>
+    void staticElectricity(ref Magic m)
+    {
+        magicCore.addBuff(buffTool.getBuff(BuffName.静电体), -1);
+    }
+
+    /// <summary>
+    /// 新星 ： 攻击次数为场上敌人数量
+    /// </summary>
+    /// <param name="m"></param>
+    void nova(ref Magic m)
+    {
+        int count = 0;
+        for (int i = 0; i <= 4; ++i)
+        {
+            if (magicCore.isMonsterLive(i))
+                ++count;
+        }
+        m.skill.addcount = count;
+    }
+
+    /// <summary>
+    /// 风暴前夕：下回合ATK+5，,所有技能附加8点基础伤害，为所有敌人添加易伤buff，立即进入防御模式，为所有防御节点添加节点保护
+    /// </summary>
+    /// <param name="m"></param>
+    void StormComing(ref Magic m)
+    {
+        magicCore.addBuff(buffTool.getBuff(BuffName.ATK上升), -1);
+        magicCore.addBuff(buffTool.getBuff(BuffName.附加伤害), -1);
+
+        foreach (Point p in magicCore.getPoint())
+        {
+            if (!p.isBroken)
+            {
+                p.isProtected = true;
+            }
+        }
+        
+        magicCore.setFlag(ClickFlag.endturn);
+    }
+
+    void capacitance(ref Magic m)
+    {
+        magicCore.addBuff(buffTool.getBuff(BuffName.电容火花), -1);
+    }
+
     public List<Skill> getInitSkills()
     {
         List<Skill> skill = new List<Skill>();
-        skill.Add(skillList[22]); //加一个魔法飞弹
+        skill.Add(skillList[23]);
+        skill.Add(skillList[31]); //加一个魔法飞弹
         return skill;
     }
 
@@ -302,31 +439,32 @@ public class SkillTool {
         int pStart = magic.magicRoute[0];
         int pEnd = magic.magicRoute[1];
 
+
         int atk = 0;
         for (int i = pStart; i <= pEnd; ++i)
         {
             atk += point[route[i].pEnd].MaxMagic;
         }
 
-        atk = (int)(atk * magic.skill.power) + (int)magic.skill.basic;
+        atk = (int)Mathf.Ceil(atk * (magic.skill.power + magic.skill.addpower)) + (int)magic.skill.basic + (int)magic.skill.addbasic;
 
         magic.Damage = atk;
+        int allcount = magic.skill.count + magic.skill.addcount;
 
         if (magic.skill.skillType == SkillType.singleE)
-            magicCore.doAttackToMonster(magic.target, magic.skill.count, (int)atk);
+            magicCore.doAttackToMonster(magic.target, allcount, (int)atk);
         else if (magic.skill.skillType == SkillType.allE)
         {
-            magicCore.doAOEToMonster(magic.skill.count, (int)atk);
+            magicCore.doAOEToMonster(allcount, (int)atk);
         }
         else if (magic.skill.skillType == SkillType.randomE)
         {
-            magicCore.doRandomToMonster(magic.skill.count, (int)atk);
+            magicCore.doRandomToMonster(allcount, (int)atk);
         }
-
     }
 
     void doNull(ref Magic m)
     {
-
+ 
     }
 }
