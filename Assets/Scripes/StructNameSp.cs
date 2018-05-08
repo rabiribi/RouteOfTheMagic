@@ -114,7 +114,21 @@ namespace RouteOfTheMagic
 
     public enum ItemName
     {
-        例子 = 0,
+        Alchemy = 0,
+        Universalnode = 1,
+        HotGem = 2,
+        Pocketwatches = 3,
+        Avalon = 4,
+        Shadowchains = 5,
+        Fourimagearray = 6,
+        SageStone = 7,
+        DoubleedgedStaff = 8,
+        FlameHeart = 9,
+        iceHeart = 10,
+        ThunderHeart = 11,
+        DeathEnd = 12,
+        DeathEnd2 = 13,
+        BatterStaff = 14,
         count
     }
 
