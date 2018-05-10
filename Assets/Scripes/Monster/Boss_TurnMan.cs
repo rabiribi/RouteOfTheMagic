@@ -22,7 +22,7 @@ namespace RouteOfTheMagic
         public void attackTurn()
         {
             
-            monster.attackPlayer(Monster.AttackType.Circle);
+//            monster.attackPlayer(Monster.AttackType.OLine);
             turnCore();
 
             return;         //补写攻击返回攻击点与攻击力
