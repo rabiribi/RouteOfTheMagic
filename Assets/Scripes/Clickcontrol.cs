@@ -53,8 +53,8 @@ public class Clickcontrol : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         //显示ATK和DEF
-        GameObject.Find("ATK").GetComponent<Text>().text = "ATK: "+magic.getATK().ToString();
-        GameObject.Find("DEF").GetComponent<Text>().text = "DEF: "+magic.getDEF().ToString();
+        GameObject.Find("ATK").GetComponent<Text>().text = "ATK: "+ magic.getATK().ToString();
+        GameObject.Find("DEF").GetComponent<Text>().text = "DEF: "+ magic.getDEF().ToString();
         GameObject.Find("HP").GetComponent<Text>().text = "HP:" + magic.getHP().ToString();
         //测试monster，获取血量等
         monster0.GetComponentInChildren<Text>().text = monster0.GetComponent<Monster>().monsterHP.ToString();

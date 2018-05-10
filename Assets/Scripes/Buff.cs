@@ -4,12 +4,14 @@ using UnityEngine;
 using RouteOfTheMagic;
 
 public class CharactorBuffTool {
-    List<Buff> buffs;
+    List<BuffBasic> buffs;
     public MagicCore magic;
-
+    public BuffBasic doingBuff;
+    public ItemTool item;
     public CharactorBuffTool()
     {
-        buffs = new List<Buff>();
+        buffs = new List<BuffBasic>();
+        doingBuff = new BuffBasic();
 
         Buff buff = new Buff(BuffName.ATK下降,1,BuffType.sBuffTurn,-1,false);
         buff.NE += doATKDown;
@@ -58,11 +60,22 @@ public class CharactorBuffTool {
         buff = new Buff(BuffName.附加伤害, 1, BuffType.sBuffSkill, -1, false);
         buff.SE += addBasic;
         buffs.Add(buff);
+        //示例item：名字：例子 ，执行类型：全局移动时触发，计数器个数3（如果不需要计数器，这里设置成1就行）
+        ItemBuff iBuff = new ItemBuff(ItemName.例子, BuffType.sBuffMove, 3);
+        iBuff.ME += Simple;//添加事件函数，函数本体在最下边
+        //添加到你的储存数组中，自己新建一个c#文件完成工具类
     }
 
-    public Buff getBuff(BuffName bName)
+ 
+     
+    public BuffBasic getBuff(BuffName bName)
     {
         return buffs[(int)bName]; 
+    }
+
+    public BuffBasic getItem(ItemName iName)
+    {
+        return buffs[(int)iName];
     }
 
     /// <summary>
@@ -104,10 +117,15 @@ public class CharactorBuffTool {
     /// </summary>
     void hotBlod(ref Magic m)
     {
-        //技能伤害导致怪物死亡,回复生命值
-        if (!magic.isMonsterLive(m.target))
+        if (doingBuff.turn > 0)
         {
-            magic.setHP(magic.getHP() + m.Damage);
+            //技能伤害导致怪物死亡,回复生命值
+            if (!magic.isMonsterLive(m.target))
+            {
+                magic.setHP(magic.getHP() + m.Damage);
+            }
+            //消耗技能的使用次数
+            --doingBuff.turn;
         }
     }
 
@@ -151,12 +169,16 @@ public class CharactorBuffTool {
     }
 
     /// <summary>
-    /// 电容器，下次技能造成的伤害翻倍
+    /// 双倍伤害，下次技能造成的伤害翻倍
     /// </summary>
     /// <param name="m"></param>
     void capacititance(ref Magic m)
     {
-        m.skill.addpower += m.skill.power + m.skill.addpower;
+        if (doingBuff.turn > 0)
+        {
+            m.skill.addpower += m.skill.power + m.skill.addpower;
+            --doingBuff.turn;
+        }
     }
 
     /// <summary>
@@ -183,5 +205,25 @@ public class CharactorBuffTool {
     void addBasic(ref Magic m)
     {
         m.skill.addbasic += 5;
+    }
+
+    /// <summary>
+    /// 例子 ： 没走过三个红色节点，下一次施法的伤害翻倍
+    /// </summary>
+    /// <param name="m"></param>
+    void Simple(Move m)
+    {
+        if (magic.getPoint(m.pEnd).color == PointColor.red)
+        {
+            //增加计数器
+            doingBuff.count += 1;
+            if (doingBuff.count >= doingBuff.maxCount)
+            {
+                //给与一层双倍伤害buff
+                magic.addBuff(getBuff(BuffName.电容火花), -1);
+                //使用次数-1
+                doingBuff.turn -= 1;
+            }
+        }
     }
 }

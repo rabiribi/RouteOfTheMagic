@@ -13,8 +13,7 @@ namespace RouteOfTheMagic
         public int attackValue;
         public List<buff> buffList = new List<buff>();
 
-        [HideInInspector]
-        public int[] attackLine;
+
         [HideInInspector]
         public int dodgeValue;
 
@@ -224,7 +223,7 @@ namespace RouteOfTheMagic
         /// <summary>
         /// Attack line type.
         /// </summary>
-        public enum AttackLineType
+        public enum AttackType
         {
             /// <summary>
             /// The random.
@@ -233,15 +232,19 @@ namespace RouteOfTheMagic
             /// <summary>
             /// The out line of route.
             /// </summary>
-            OutLine = 1,
+            OutCore = 1,
             /// <summary>
             /// The inside line.
             /// </summary>
-            InsideLine =2,
+            InsideCore = 2,
             /// <summary>
             /// The circle line(Only for boss, rare skill).
             /// </summary>
             Circle = 3,
+            /// <summary>
+            /// The middle core of all.
+            /// </summary>
+            InnerCore = 4,
         }
 
         public struct buff
@@ -343,7 +346,7 @@ namespace RouteOfTheMagic
                                      buffTime,
                                      tempBuffValue,
                                      (BuffOverlapType)buffOverlapType);
-            //如果是回复持续回合数的技能（比如易伤），以新的buff替换原有buff
+            //如果是回复持续回合数的技能（比如易伤、虚弱），以新的buff替换原有buff
             if (tempbuff.buffOverlapType == BuffOverlapType.BuffCountRecover) 
             {
                 for (int i = 0; i < buffList.Count; i++)
@@ -355,8 +358,14 @@ namespace RouteOfTheMagic
                     }
                 }
             }
+            if (tempbuff.buffOverlapType == BuffOverlapType.BuffValueAdd)
+            {
+                
+            }
             buffList.Add(tempbuff);
+
         }
+
 
         /// <summary>
         /// Gets the add buff identifier from magic core.
@@ -395,6 +404,39 @@ namespace RouteOfTheMagic
             }
         }
 
+        //public void getAddBuffID(int buffid,int bufftime,int buffvalue)
+        //{
+        //    switch (buffid)
+        //    {
+        //        case 1: //伤害免疫50%
+        //            addBuff(1, 11, 0, 1, 5, 1); 
+        //            break;
+        //        case 2: //缓慢回复
+        //            addBuff(2, 2, 1, bufftime, buffvalue, 2);
+        //            break;
+        //        case 3: //嘲讽
+        //            addBuff(3, 6, 0, 1, 1, 1);
+        //            break;
+        //        case 4: //增加攻击力
+        //            addBuff(4, 0, 1, bufftime, buffvalue, 2);
+        //            break;
+        //        case 5: //降低攻击力
+        //            addBuff(5, 1, 1, bufftime, buffvalue, 2);
+        //            break;
+        //        case 6: //流血、毒
+        //            addBuff(6, 3, 1, bufftime, buffvalue, 2);
+        //            break;
+        //        case 7: //易伤
+        //            addBuff(7, 10, 1, bufftime, 5, 1);
+        //            break;
+        //        case 8: //虚弱
+        //            addBuff(8, 12, 1, bufftime, 1, 1);
+        //            break;
+        //        default:
+        //            break;
+        //    }
+        //}
+
         /// <summary>
         /// Checks the weak buff.
         /// </summary>
@@ -430,8 +472,6 @@ namespace RouteOfTheMagic
         /// <summary>
         /// Attacks the declaration.
         /// </summary>
-        /// <param name="tempAttackValue">Temp attack value.</param>
-        /// <param name="basicAttackLine">Attack line.</param>
         public List<int> attackDeclaration()
         {
             List<int> tempValue = new List<int>();
@@ -451,8 +491,8 @@ namespace RouteOfTheMagic
             }
 
             //tempValue.Add(tempAttackValue);
-            tempValue.Add(6);
-            tempValue.Add(11);
+            tempValue.Add(6);                   //*************对接攻击哪个珠子
+            tempValue.Add(tempAttackValue);
             return tempValue;
         }
 
@@ -474,7 +514,7 @@ namespace RouteOfTheMagic
                 }
             }
             reduceMonsterHP(tempDamageValue);
-            checkDeath();
+         //   checkDeath();         外部来check
         }
 
         /// <summary>
@@ -489,29 +529,27 @@ namespace RouteOfTheMagic
         /// <summary>
         /// Attacks the player line.
         /// </summary>
-        /// <param name="attackType">Attack type presented by the enum AttackLineType.</param>
-        public int[] attackPlayerLine(AttackLineType attackType)
+        /// <param name="attackType">Attack type presented by the enum AttackType.</param>
+        public void attackPlayer(AttackType attackType)
         {
-            int[] temp = null;
-            if (attackType == AttackLineType.Random)
-            {
-                // temp[0] = Random.Range(0)
-                temp[0] = 1;
-            }
-            if (attackType ==AttackLineType.OutLine)
+            if (attackType == AttackType.Random)
             {
 
             }
-            if (attackType == AttackLineType.InsideLine)
+            if (attackType ==AttackType.OutCore)
             {
 
             }
-            if (attackType == AttackLineType.Circle)
+            if (attackType == AttackType.InsideCore)
+            {
+
+            }
+            if (attackType == AttackType.Circle)
             {
 
             }
 
-            return temp;
+           
         }
     }
 }
