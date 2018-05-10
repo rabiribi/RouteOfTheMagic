@@ -13,6 +13,8 @@ public class ItemTool  {
 
     public ItemTool()
     {
+        itemList = new List<ItemBuff>();
+        magiccore = MagicCore.Instance;
         ItemBuff ib = new ItemBuff(ItemName.Alchemy, BuffType.sBuffMove, 5);
         ib.ME += alchemyE;//添加事件
         itemList.Add(ib);

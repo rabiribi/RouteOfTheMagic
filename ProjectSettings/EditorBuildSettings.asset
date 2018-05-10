@@ -11,3 +11,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Magic.unity
     guid: 9c46fd7ad71b40c45ac9318df9c8b990
+  - enabled: 1
+    path: Assets/Scenes/Shop.unity
+    guid: cad02a9756c7b2645b0dca3e4dd2e9a8
