@@ -84,7 +84,8 @@ namespace RouteOfTheMagic
                     if (instance == null)
                     {
                         // 如果没有找到， 则新建一个
-                        GameObject obj = new GameObject("Name");
+
+                        GameObject obj = new GameObject("main");
                         // 对象不可见，不会被保存
                         obj.hideFlags = HideFlags.HideAndDontSave;
                         // 强制转换为 T 
@@ -316,6 +317,15 @@ namespace RouteOfTheMagic
                     item.SetActive(false);
                 }
             }
+            else if(mapNode.nodeType == NodeType.shop)
+            {
+                SceneManager.LoadSceneAsync("Shop");
+                mapRoot.SetActive(false);
+                foreach (var item in Root)
+                {
+                    item.SetActive(false);
+                }
+            }
             Debug.Log(mapNode.nodeType);
         }
         ButtonEx CreatButton(Vector2 pos,Vector2 size, Sprite sprite,Color color= new Color())
@@ -331,6 +341,7 @@ namespace RouteOfTheMagic
             img.fillCenter = true;
             img.raycastTarget = true;
             img.sprite = sprite;
+
             if (img.sprite != null)
                 img.type = Image.Type.Sliced;
             ButtonEx button=go.AddComponent<ButtonEx>();
@@ -341,6 +352,12 @@ namespace RouteOfTheMagic
             go.GetComponent<Selectable>().image = img;
             go.transform.SetParent(mapRoot.transform);
             go.transform.localPosition = pos;
+            //ColorBlock cb = new ColorBlock();
+            //cb.normalColor = Color.white;
+            //cb.highlightedColor = Color.green;
+            //cb.pressedColor = Color.blue;
+            //cb.disabledColor = Color.black;
+            //button.colors = cb;
             return button;
         }
         // Update is called once per frame
@@ -359,7 +376,8 @@ namespace RouteOfTheMagic
         public void SceneEnd(bool istrue)
         {
             int layer = currentMapNode.layer;
-            if(istrue)
+            currentMapNode.button.interactable = false;
+            if (istrue)
                 foreach (var item in currentMapNode.child)
                 {
                     map[layer+1][item].FatherIsPass = true;

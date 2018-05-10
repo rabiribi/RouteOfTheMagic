@@ -11,6 +11,7 @@ namespace RouteOfTheMagic
         public int monsterHP;
         public int maxMonsterHP;
         public int attackValue;
+        public AttackType attackType;
         public List<buff> buffList = new List<buff>();
 
 
@@ -195,6 +196,13 @@ namespace RouteOfTheMagic
 
         }
 
+        public enum BuffConnection
+        {
+            Poison,
+            Weak,
+            EasilyInjured
+        }
+
         /// <summary>
         /// Buff last type.
         /// </summary>
@@ -215,8 +223,17 @@ namespace RouteOfTheMagic
         /// </summary>
         public enum BuffOverlapType
         {
+            /// <summary>
+            /// The buff value add.
+            /// </summary>
             BuffValueAdd =0,
+            /// <summary>
+            /// The buff count recover.
+            /// </summary>
             BuffCountRecover =1,
+            /// <summary>
+            /// The buff number add.
+            /// </summary>
             BuffNumAdd=2,
         }
 
@@ -232,19 +249,24 @@ namespace RouteOfTheMagic
             /// <summary>
             /// The out line of route.
             /// </summary>
-            OutCore = 1,
+            VLine = 1,
             /// <summary>
             /// The inside line.
             /// </summary>
-            InsideCore = 2,
+            XLine = 2,
             /// <summary>
             /// The circle line(Only for boss, rare skill).
             /// </summary>
-            Circle = 3,
+            OLine = 3,
             /// <summary>
             /// The middle core of all.
             /// </summary>
-            InnerCore = 4,
+            DoubleLine = 4,
+            /// <summary>
+            /// The trible line.
+            /// </summary>
+            TribleLine = 5,
+            PointLine = 6,
         }
 
         public struct buff
@@ -404,38 +426,38 @@ namespace RouteOfTheMagic
             }
         }
 
-        //public void getAddBuffID(int buffid,int bufftime,int buffvalue)
-        //{
-        //    switch (buffid)
-        //    {
-        //        case 1: //伤害免疫50%
-        //            addBuff(1, 11, 0, 1, 5, 1); 
-        //            break;
-        //        case 2: //缓慢回复
-        //            addBuff(2, 2, 1, bufftime, buffvalue, 2);
-        //            break;
-        //        case 3: //嘲讽
-        //            addBuff(3, 6, 0, 1, 1, 1);
-        //            break;
-        //        case 4: //增加攻击力
-        //            addBuff(4, 0, 1, bufftime, buffvalue, 2);
-        //            break;
-        //        case 5: //降低攻击力
-        //            addBuff(5, 1, 1, bufftime, buffvalue, 2);
-        //            break;
-        //        case 6: //流血、毒
-        //            addBuff(6, 3, 1, bufftime, buffvalue, 2);
-        //            break;
-        //        case 7: //易伤
-        //            addBuff(7, 10, 1, bufftime, 5, 1);
-        //            break;
-        //        case 8: //虚弱
-        //            addBuff(8, 12, 1, bufftime, 1, 1);
-        //            break;
-        //        default:
-        //            break;
-        //    }
-        //}
+        public void playerGiveBuff(BuffConnection buff,int bufftime,int buffvalue)
+        {
+            switch (buff)
+            {
+                //case 1: //伤害免疫50%
+                //    addBuff(1, 11, 0, 1, 5, 1); 
+                //    break;
+                //case 2: //缓慢回复
+                //    addBuff(2, 2, 1, bufftime, buffvalue, 2);
+                //    break;
+                //case 3: //嘲讽
+                //    addBuff(3, 6, 0, 1, 1, 1);
+                //    break;
+                //case 4: //增加攻击力
+                //    addBuff(4, 0, 1, bufftime, buffvalue, 2);
+                //    break;
+                //case 5: //降低攻击力
+                    //addBuff(5, 1, 1, bufftime, buffvalue, 2);
+                    //break;
+                case BuffConnection.Poison: //毒
+                    addBuff(6, 3, 1, bufftime, buffvalue, 2);
+                    break;
+                case BuffConnection.EasilyInjured: //易伤
+                    addBuff(7, 10, 1, bufftime, 5, 1);
+                    break;
+                case BuffConnection.Weak: //虚弱
+                    addBuff(8, 12, 1, bufftime, 1, 1);
+                    break;
+                default:
+                    break;
+            }
+        }
 
         /// <summary>
         /// Checks the weak buff.
@@ -489,11 +511,34 @@ namespace RouteOfTheMagic
                     tempAttackValue -= buffList[i].buffValue;
                 }
             }
-
-            //tempValue.Add(tempAttackValue);
-            tempValue.Add(6);                   //*************对接攻击哪个珠子
             tempValue.Add(tempAttackValue);
-            return tempValue;
+            if (attackType == AttackType.Random)
+            {
+                //访问线的list
+                //tempValue.Add(line);
+            }
+            if (attackType == AttackType.VLine)
+            {
+
+            }
+            if (attackType == AttackType.XLine)
+            {
+
+            }
+            if (attackType == AttackType.OLine)
+            {
+
+            }
+            if (attackType == AttackType.DoubleLine)
+            {
+
+            }
+            if (attackType == AttackType.PointLine)
+            {
+
+            }
+           // tempValue.Add(tempAttackValue);
+            return tempValue;   
         }
 
         /// <summary>
@@ -526,30 +571,39 @@ namespace RouteOfTheMagic
             checkBuffCount();
         }
 
-        /// <summary>
-        /// Attacks the player line.
-        /// </summary>
-        /// <param name="attackType">Attack type presented by the enum AttackType.</param>
+        ///// <summary>
+        ///// Attacks the player line.
+        ///// </summary>
+        ///// <param name="attackType">Attack type presented by the enum AttackType.</param>
         public void attackPlayer(AttackType attackType)
         {
+            
             if (attackType == AttackType.Random)
             {
 
             }
-            if (attackType ==AttackType.OutCore)
+            if (attackType ==AttackType.VLine)
             {
 
             }
-            if (attackType == AttackType.InsideCore)
+            if (attackType == AttackType.XLine)
             {
 
             }
-            if (attackType == AttackType.Circle)
+            if (attackType == AttackType.OLine)
             {
 
             }
+            if(attackType == AttackType.DoubleLine)
+            {
+                
+            }
+            if(attackType == AttackType.PointLine)
+            {
+                
+            }
 
-           
+    
         }
     }
 }

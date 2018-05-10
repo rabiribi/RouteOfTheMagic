@@ -51,7 +51,7 @@ public class MagicCore {
 
     public SkillTool skillTool;    //技能工具
     public ItemTool itemTool;
-
+    
     protected List<Point> mPoint;     //节点列表
     protected List<Line> mLine;       //边列表
     protected List<Skill> mSkill;     //技能列表
@@ -61,7 +61,7 @@ public class MagicCore {
     protected List<Move> mRoute;       //本回合已经走过的路径
 
     protected Magic skillReady;        //准备释放的技能
-
+    
     //触发器状态
     ClickFlag cf;           //当前点击一个节点会发生什么
     bool isWin;
@@ -74,7 +74,7 @@ public class MagicCore {
 
     //全局变量
     public int skillPoint; //剩余技能点数
-    public int Money;      //金钱
+    public int Money=30;      //金钱
 
     private static MagicCore instance;
 
@@ -1613,6 +1613,26 @@ public class MagicCore {
                 break;
             }
         }
+    }
+
+    public bool addSKill(Skill s)
+    {
+        bool r = false;
+        if (mSkill.Count > 3)
+        {
+            r = false;
+        }
+        else
+        {
+            mSkill.Add(s);
+            r = true;
+        }
+        return r;
+    }
+
+    public void replaceSkill(Skill s,int id)
+    {
+        mSkill[id] = s;
     }
 
     //查询接口

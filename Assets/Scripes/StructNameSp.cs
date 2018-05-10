@@ -108,7 +108,7 @@ namespace RouteOfTheMagic
         ATK上升 = 9,
         风暴前夕 = 10,
         附加伤害 = 11,
-       
+        无敌 = 12,
         count
     }
 
