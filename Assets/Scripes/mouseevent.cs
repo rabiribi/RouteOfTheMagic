@@ -7,9 +7,9 @@ using RouteOfTheMagic;
 public class mouseevent : MonoBehaviour {
     // Use this for initialization
     [SerializeField]
-    Sprite mySprite;
+    public Sprite mySprite;
     [SerializeField]
-    Sprite oldSprite;
+    public Sprite oldSprite;
     MagicCore magic;
     List<Point> pList;
     void Start () {
