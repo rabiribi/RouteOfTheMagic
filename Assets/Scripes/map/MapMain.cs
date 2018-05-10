@@ -105,6 +105,7 @@ namespace RouteOfTheMagic
             magicCore = MagicCore.Instance;
             render = mapRoot.transform.GetChild(0).GetComponent<UiRender>();
             Init();
+            
 
             DontDestroyOnLoad(this.gameObject);
             

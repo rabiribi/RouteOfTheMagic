@@ -64,6 +64,7 @@ public class MagicCore {
 
     //触发器状态
     ClickFlag cf;           //当前点击一个节点会发生什么
+    bool isWin;
 
     //拖动记录
     List<Move> DragDoc;       //本回合已经走过的路径
@@ -993,6 +994,15 @@ public class MagicCore {
         {
             mMonster[monsterID].getDamage(damage);
         }
+
+        bool alive = false;
+        for (int i = 0; i < mMonster.Count; ++i)
+        {
+            if (isMonsterLive(i))
+                alive = true;
+        }
+        if (!alive)
+            Victory();
     }
 
     public void doAOEToMonster(int count, int damage)
@@ -1404,6 +1414,7 @@ public class MagicCore {
         DEF = MaxDEF;
         ++turn;
         cf = ClickFlag.normal;
+        
 
         //存入初始路径
         Move m;
@@ -1432,8 +1443,11 @@ public class MagicCore {
         initMonsterAttack();
 
         //执行开始事件
-        if(turn == 1)
+        if (turn == 1)
+        {
             doBuff(BuffType.sBuffStart);
+            isWin = false;
+        }
 
         doBuff(BuffType.sBuffTurn);
 
@@ -1533,7 +1547,7 @@ public class MagicCore {
         for (int i = 0; i < buffList.Count; ++i)
         {
             BuffBasic b = buffList[i];
-            if (b.turn > 0)
+            if (b.GetType() == typeof(Buff))
             {
                 buffList.RemoveAt(i);
             }
@@ -1542,6 +1556,7 @@ public class MagicCore {
         //清除计数器
         turn = 0;
         cf = ClickFlag.inmap;
+        isWin = true;
 
         //清除怪物列表
         mMonster.Clear();
@@ -1943,6 +1958,15 @@ public class MagicCore {
             r = true;
         }
         return r;
+    }
+
+    public Skill getSkill(int id)
+    {
+        if (id < mSkill.Count)
+        {
+            return mSkill[id];
+        }
+        return mSkill[0];
     }
 
     /// <summary>

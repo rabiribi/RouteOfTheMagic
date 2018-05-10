@@ -891,6 +891,8 @@ MonoBehaviour:
   Root:
   - {fileID: 162164714}
   - {fileID: 1866647905}
+  - {fileID: 1758726413}
+  - {fileID: 759187329}
   layerCount: 12
   sprite: {fileID: 21300000, guid: b4deb919f5cc9b444b623c56bdf05ef0, type: 3}
 --- !u!1 &1475619420
