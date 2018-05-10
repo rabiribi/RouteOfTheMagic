@@ -231,7 +231,7 @@ public class ItemTool {
         {
             magiccore.setHP(magiccore.getHP() - 1);
         }
-    }//贤者之石，bug
+    }//贤者之石，可用
 
     public void DoubleedgedStaff()
     {
@@ -290,16 +290,22 @@ public class ItemTool {
     {
         int hp;
         int damage;
-        Debug.Log(magiccore.getHP()+"1");
-        damage = dam.dam;
-        Debug.Log(magiccore.getHP()+"2");
         hp = magiccore.getHP();
-        if (hp-damage <= 0)
+        Debug.Log(hp);
+        
+        if (hp <= 0)
         {
-            hp = 20;
-            magiccore.setHP(hp);
-            doingbuff.count+=1;
+            if (doingbuff.count == 0)
+            {
+                magiccore.addBuff(magiccore.skillTool.buffTool.getBuff(BuffName.无敌),-1);
+                
+                magiccore.setHP(hp);
+                doingbuff.count += 1;
+            }
+           
         }
+        else
+        { }
         
     }
     public void DeathEnd2()

@@ -60,6 +60,10 @@ public class CharactorBuffTool {
         buff = new Buff(BuffName.附加伤害, 1, BuffType.sBuffSkill, -1, false);
         buff.SE += addBasic;
         buffs.Add(buff);
+
+        buff = new Buff(BuffName.无敌, 1, BuffType.sBuffDamage, -1, false);
+        buff.DE += Unstopable;
+        buffs.Add(buff);
         //示例item：名字：例子 ，执行类型：全局移动时触发，计数器个数3（如果不需要计数器，这里设置成1就行）
         ItemBuff iBuff = new ItemBuff(ItemName.例子, BuffType.sBuffMove, 3);
         iBuff.ME += Simple;//添加事件函数，函数本体在最下边
@@ -225,5 +229,10 @@ public class CharactorBuffTool {
                 doingBuff.turn -= 1;
             }
         }
+    }
+
+    void Unstopable(Damage dam)
+    {
+        magic.setHP(magic.getHP() + dam.dam);
     }
 }
