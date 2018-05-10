@@ -12,15 +12,20 @@ public class MagicCore {
         mPoint = getInitPoint();
         mRoute = new List<Move>();
         DragDoc = new List<Move>();
+        buffList = new List<BuffBasic>();
 
         skillTool = new SkillTool();
         skillTool.magicCore = this;
         skillTool.buffTool.magic = this;
+
+        itemTool = new ItemTool();
+        itemTool.magiccore = this;
+
         mSkill = skillTool.getInitSkills();
         mMonster = new List<Monster>();
         mMonsterAttack = new List<EDamage>();
-        buffList = new List<BuffBasic>();
-
+           
+        addBuff(itemTool.getItem(ItemName.DeathEnd), -1);
         MaxHp = 100;
         MaxATK = 10;
         MaxDEF = 1;
@@ -44,8 +49,9 @@ public class MagicCore {
     protected int pointUsedCount;     //当前使用过的节点个数
     protected int paceCount;          //当前走过的路径数目
 
-    protected SkillTool skillTool;    //技能工具
-
+    public SkillTool skillTool;    //技能工具
+    public ItemTool itemTool;
+    
     protected List<Point> mPoint;     //节点列表
     protected List<Line> mLine;       //边列表
     protected List<Skill> mSkill;     //技能列表
@@ -55,9 +61,10 @@ public class MagicCore {
     protected List<Move> mRoute;       //本回合已经走过的路径
 
     protected Magic skillReady;        //准备释放的技能
-
+    
     //触发器状态
     ClickFlag cf;           //当前点击一个节点会发生什么
+    bool isWin;
 
     //拖动记录
     List<Move> DragDoc;       //本回合已经走过的路径
@@ -107,15 +114,22 @@ public class MagicCore {
         {
             Skill s = mSkill[i];
             List<PointColor> pc = s.mRequire;
-
-            if (getSuitRoute(pc, s.skillDoType).Count != 0)
+            List<int> pL = getSuitRoute(pc, s.skillDoType);
+            if (pL.Count != 0)
             {
                 s.useable = true;
-                //Debug.Log(getSuitRoute(pc, s.skillDoType)[0] + " " + getSuitRoute(pc, s.skillDoType)[1]);
+                int dmg = 0;
+                for (int p = pL[0]; p <= pL[1]; ++p)
+                {
+                    dmg += mPoint[mRoute[p].pEnd].magic;
+                }
+                dmg = (int)((mSkill[i].power * dmg + mSkill[i].basic) * mSkill[i].count);
+                mSkill[i].damage = dmg;
             }
             else
             {
                 s.useable = false;
+                mSkill[i].damage = 0;
             }
 
         }
@@ -399,8 +413,8 @@ public class MagicCore {
         }
         if (sdt == SkillDoType.single)
         {
-            //顺序找第一个点
-            for (int i = 0; i < mRoute.Count; ++i)
+            //顺序找最后一个点
+            for (int i = mRoute.Count - 1; i >= 0; --i)
             {
                 if (mPoint[mRoute[i].pEnd].color == pc[0] && !mPoint[mRoute[i].pEnd].isBroken)
                 {
@@ -438,10 +452,12 @@ public class MagicCore {
         }
         int pcID = 0;
 
+        Debug.Log(RStart);
         //恢复魔力
         for (int i = 0; i < RStart; ++i)
         {
             recoverMagic(mRoute[i].pEnd);
+           
         }
 
         //如果没有要求，就啥都不做
@@ -844,11 +860,13 @@ public class MagicCore {
     /// </summary>
     void doBuff(BuffType bt)
     {
-        foreach (BuffBasic buff in buffList)
+        for (int i = 0; i < buffList.Count; ++i)
         {
+            BuffBasic buff = buffList[i];
             if (buff.type == bt && buff.turn > 0)
             {
                 skillTool.buffTool.doingBuff = buff;
+                itemTool.doingbuff = buff;
                 buff.NE();
                 
             }
@@ -858,11 +876,13 @@ public class MagicCore {
 
     void doBuff(BuffType bt, int pID)
     {
-        foreach (BuffBasic buff in mPoint[pID].buff)
+        for (int i = 0; i < buffList.Count; ++i)
         {
+            BuffBasic buff = buffList[i];
             if (buff.type == bt && buff.turn > 0)
             {
                 skillTool.buffTool.doingBuff = buff;
+                itemTool.doingbuff = buff;
                 buff.NE();
                 
             }
@@ -872,11 +892,13 @@ public class MagicCore {
 
     void doBuff(Move m)
     {
-        foreach (BuffBasic buff in buffList)
+        for (int i = 0;i<buffList.Count;++i)
         {
+            BuffBasic buff = buffList[i];
             if (buff.type == BuffType.sBuffMove && buff.turn > 0)
             {
                 skillTool.buffTool.doingBuff = buff;
+                itemTool.doingbuff = buff;
                 buff.ME(m);
                
             }
@@ -886,11 +908,13 @@ public class MagicCore {
 
     void doBuff(Move m,int pID)
     {
-        foreach (BuffBasic buff in mPoint[pID].buff)
+        for (int i = 0; i < buffList.Count; ++i)
         {
+            BuffBasic buff = buffList[i];
             if (buff.type == BuffType.pBuffMoveIn && buff.turn > 0)
             {
                 skillTool.buffTool.doingBuff = buff;
+                itemTool.doingbuff = buff;
                 buff.ME(m);
                
             }
@@ -900,11 +924,13 @@ public class MagicCore {
 
     void doBuff(Magic m,BuffType bt)
     {
-        foreach (BuffBasic buff in buffList)
+        for (int i = 0; i < buffList.Count; ++i)
         {
+            BuffBasic buff = buffList[i];
             if (buff.type == bt && buff.turn > 0)
             {
                 skillTool.buffTool.doingBuff = buff;
+                itemTool.doingbuff = buff;
                 buff.SE(ref m);
                
             }
@@ -915,11 +941,13 @@ public class MagicCore {
 
     void doBuff(Magic m, int pID)
     {
-        foreach (BuffBasic buff in mPoint[pID].buff)
+        for (int i = 0; i < buffList.Count; ++i)
         {
+            BuffBasic buff = buffList[i];
             if (buff.type == BuffType.pBuffSkill && buff.turn > 0)
             {
                 skillTool.buffTool.doingBuff = buff;
+                itemTool.doingbuff = buff;
                 buff.SE(ref m);
                
             }
@@ -929,11 +957,13 @@ public class MagicCore {
 
     void doBuff(Damage d)
     {
-        foreach (BuffBasic buff in buffList)
+        for (int i = 0; i < buffList.Count; ++i)
         {
+            BuffBasic buff = buffList[i];
             if (buff.type == BuffType.sBuffDamage && buff.turn > 0)
             {
                 skillTool.buffTool.doingBuff = buff;
+                itemTool.doingbuff = buff;
                 buff.DE(d);
                
             }
@@ -943,11 +973,13 @@ public class MagicCore {
 
     void doBuff(Defen d)
     {
-        foreach (BuffBasic buff in buffList)
+        for (int i = 0; i < buffList.Count; ++i)
         {
+            BuffBasic buff = buffList[i];
             if (buff.type == BuffType.sBuffDefence && buff.turn > 0)
             {
                 skillTool.buffTool.doingBuff = buff;
+                itemTool.doingbuff = buff;
                 buff.DFE(d);
                
             }
@@ -962,6 +994,15 @@ public class MagicCore {
         {
             mMonster[monsterID].getDamage(damage);
         }
+
+        bool alive = false;
+        for (int i = 0; i < mMonster.Count; ++i)
+        {
+            if (isMonsterLive(i))
+                alive = true;
+        }
+        if (!alive)
+            Victory();
     }
 
     public void doAOEToMonster(int count, int damage)
@@ -1190,6 +1231,7 @@ public class MagicCore {
             {
                 skillReady.skill = s;               //保存准备释放的技能对象
                 skillReady.magicRoute = getSuitRoute(s.mRequire, s.skillDoType);   //获取技能的子路径
+                Debug.Log("0");
 
                 if (s.skillType == SkillType.singleE)
                 {
@@ -1197,6 +1239,7 @@ public class MagicCore {
                 }
                 else
                 {
+                    Debug.Log("1");
                     doSkill();
                 }
             }
@@ -1262,7 +1305,13 @@ public class MagicCore {
     {
         //依次存入路径
         for (int i = 0; i < DragDoc.Count; ++i)
+        {
             mRoute.Add(DragDoc[i]);
+            ++pointUsedCount;
+            doBuff(DragDoc[i]);
+        }
+
+        
 
         paceCount += DragDoc.Count;
         DragDoc.Clear();
@@ -1365,6 +1414,7 @@ public class MagicCore {
         DEF = MaxDEF;
         ++turn;
         cf = ClickFlag.normal;
+        
 
         //存入初始路径
         Move m;
@@ -1393,8 +1443,11 @@ public class MagicCore {
         initMonsterAttack();
 
         //执行开始事件
-        if(turn == 1)
+        if (turn == 1)
+        {
             doBuff(BuffType.sBuffStart);
+            isWin = false;
+        }
 
         doBuff(BuffType.sBuffTurn);
 
@@ -1494,7 +1547,7 @@ public class MagicCore {
         for (int i = 0; i < buffList.Count; ++i)
         {
             BuffBasic b = buffList[i];
-            if (b.turn > 0)
+            if (b.GetType() == typeof(Buff))
             {
                 buffList.RemoveAt(i);
             }
@@ -1503,6 +1556,7 @@ public class MagicCore {
         //清除计数器
         turn = 0;
         cf = ClickFlag.inmap;
+        isWin = true;
 
         //清除怪物列表
         mMonster.Clear();
@@ -1560,6 +1614,26 @@ public class MagicCore {
                 break;
             }
         }
+    }
+
+    public bool addSKill(Skill s)
+    {
+        bool r = false;
+        if (mSkill.Count > 3)
+        {
+            r = false;
+        }
+        else
+        {
+            mSkill.Add(s);
+            r = true;
+        }
+        return r;
+    }
+
+    public void replaceSkill(Skill s,int id)
+    {
+        mSkill[id] = s;
     }
 
     //查询接口
@@ -1904,6 +1978,15 @@ public class MagicCore {
             r = true;
         }
         return r;
+    }
+
+    public Skill getSkill(int id)
+    {
+        if (id < mSkill.Count)
+        {
+            return mSkill[id];
+        }
+        return mSkill[0];
     }
 
     /// <summary>
