@@ -11,6 +11,7 @@ namespace RouteOfTheMagic
         public int monsterHP;
         public int maxMonsterHP;
         public int attackValue;
+        public AttackType attackType;
         public List<buff> buffList = new List<buff>();
 
 
@@ -510,11 +511,34 @@ namespace RouteOfTheMagic
                     tempAttackValue -= buffList[i].buffValue;
                 }
             }
-
-            //tempValue.Add(tempAttackValue);
-            tempValue.Add(6);                   //*************对接攻击哪个珠子
             tempValue.Add(tempAttackValue);
-            return tempValue;
+            if (attackType == AttackType.Random)
+            {
+                //访问线的list
+                //tempValue.Add(line);
+            }
+            if (attackType == AttackType.VLine)
+            {
+
+            }
+            if (attackType == AttackType.XLine)
+            {
+
+            }
+            if (attackType == AttackType.OLine)
+            {
+
+            }
+            if (attackType == AttackType.DoubleLine)
+            {
+
+            }
+            if (attackType == AttackType.PointLine)
+            {
+
+            }
+           // tempValue.Add(tempAttackValue);
+            return tempValue;   
         }
 
         /// <summary>
@@ -547,12 +571,13 @@ namespace RouteOfTheMagic
             checkBuffCount();
         }
 
-        /// <summary>
-        /// Attacks the player line.
-        /// </summary>
-        /// <param name="attackType">Attack type presented by the enum AttackType.</param>
+        ///// <summary>
+        ///// Attacks the player line.
+        ///// </summary>
+        ///// <param name="attackType">Attack type presented by the enum AttackType.</param>
         public void attackPlayer(AttackType attackType)
         {
+            
             if (attackType == AttackType.Random)
             {
 
@@ -577,7 +602,8 @@ namespace RouteOfTheMagic
             {
                 
             }
-           
+
+    
         }
     }
 }
