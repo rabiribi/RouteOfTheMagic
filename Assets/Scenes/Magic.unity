@@ -338,6 +338,9 @@ MonoBehaviour:
   showState: {fileID: 1047453022}
   gameOver: {fileID: 1833307236}
   canvas: {fileID: 596403104}
+  ATK: {fileID: 700984505}
+  DEF: {fileID: 770151557}
+  HP: {fileID: 1800121720}
   skillList:
   - {fileID: 299655542}
   - {fileID: 1626331177}
@@ -693,6 +696,7 @@ MonoBehaviour:
   monsterHP: 10
   maxMonsterHP: 100
   attackValue: 20
+  attackType: 0
   dodgeValue: 0
 --- !u!1 &250411014
 GameObject:
@@ -705,7 +709,7 @@ GameObject:
   - component: {fileID: 250411017}
   - component: {fileID: 250411016}
   m_Layer: 5
-  m_Name: ATK
+  m_Name: Atk
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -779,7 +783,7 @@ GameObject:
   - component: {fileID: 292038251}
   - component: {fileID: 292038250}
   m_Layer: 5
-  m_Name: ATK
+  m_Name: Atk
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1197,7 +1201,7 @@ GameObject:
   - component: {fileID: 332912729}
   - component: {fileID: 332912728}
   m_Layer: 5
-  m_Name: ATK
+  m_Name: Atk
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5578,7 +5582,7 @@ GameObject:
   - component: {fileID: 2122263225}
   - component: {fileID: 2122263224}
   m_Layer: 5
-  m_Name: ATK
+  m_Name: Atk
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
