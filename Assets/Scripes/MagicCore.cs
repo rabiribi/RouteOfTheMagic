@@ -763,6 +763,7 @@ public class MagicCore {
         }
         skillReady.skill.beforeDo(ref skillReady);
         skillReady.skill.skillDo(ref skillReady);
+        skillReady.skill.damage = 0;
         skillReady.skill.useable = false;
         //释放技能攻击效果
         if (skillReady.Damage > 0)
@@ -1231,7 +1232,6 @@ public class MagicCore {
             {
                 skillReady.skill = s;               //保存准备释放的技能对象
                 skillReady.magicRoute = getSuitRoute(s.mRequire, s.skillDoType);   //获取技能的子路径
-                Debug.Log("0");
 
                 if (s.skillType == SkillType.singleE)
                 {
@@ -1239,7 +1239,6 @@ public class MagicCore {
                 }
                 else
                 {
-                    Debug.Log("1");
                     doSkill();
                 }
             }

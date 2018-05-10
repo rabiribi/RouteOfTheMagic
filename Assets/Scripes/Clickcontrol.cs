@@ -8,8 +8,8 @@ using RouteOfTheMagic;
 public class Clickcontrol : MonoBehaviour {
 
     public MagicCore magic;
-    public mouseevent mouse;
-    public Monster monster;
+    mouseevent mouse;
+    Monster monster;
     public GameObject node;
     public GameObject nodes;
     public GameObject lines;
@@ -17,28 +17,40 @@ public class Clickcontrol : MonoBehaviour {
     public GameObject monster0;
     public GameObject startButton;
     public GameObject showState;
+    public GameObject gameOver;
+    public GameObject canvas;
     public List<GameObject> skillList;
     public Sprite tempSprite;
     private GameObject instance;
     private GameObject btnGameObject;
     private List<GameObject> lineGameObjectlist;
+    ItemBuff Ibuff;
+    ItemName it;
+    
 
     public static bool isDrag;
+    public bool isShow;
     private bool isAttacking;
     private float width;
     private float height;
+    private int overCount;
     // Use this for initialization
     void Start () {
         width = showState.GetComponent<RectTransform>().rect.width;
         height = showState.GetComponent<RectTransform>().rect.height;
 
         magic = MagicCore.Instance;
+        it = (ItemName)Random.Range(0, (int)ItemName.count);
+        Ibuff = magic.itemTool.getItem(it);
         monster = new Monster();
         mouse = new mouseevent();
         lineGameObjectlist = new List<GameObject>();
         isDrag = false;
         isAttacking = false;
+        isShow = false;
         instance = node;
+        //三个结算物品
+        overCount = 3;
 
         magic.addMonster(monster0.GetComponent<Monster>());
         magic.startTurn();
@@ -90,8 +102,17 @@ public class Clickcontrol : MonoBehaviour {
         {
             if (magic.isMonsterLive(i))
                 break;
-            else if (i == 3)
-                break;
+            if (i == 3&&!isShow)
+            {
+                gameOver.SetActive(true);
+                GameObject.Find("tool").GetComponentInChildren<Text>().text = Ibuff.iName.ToString();
+                isShow = true;
+            }
+        }
+        if (overCount == 0)
+        {
+            MapMain.Instance.SceneEnd(true);
+            canvas.SetActive(false);
         }
     }
     //初始化
@@ -321,5 +342,25 @@ public class Clickcontrol : MonoBehaviour {
         }
     }
 
+    //技能++
+    public void spPlus()
+    {
+        magic.skillPoint += 1;
+        overCount--;
+    }
     
+    //money+10
+    public void mPlus()
+    {
+        magic.Money += 10;
+        overCount--;
+    }
+
+    //加道具
+    public void toolPlus()
+    {
+        magic.addBuff(Ibuff, -1);
+        magic.itemTool.removeItem(Ibuff.iName);
+        overCount--;
+    }
 }

@@ -319,4 +319,16 @@ public class ItemTool {
         p.magic++;
         
     }//连击法杖
+
+    public void removeItem(ItemName it)
+    {
+        foreach (ItemBuff ib in itemList)
+        {
+            if (ib.iName == it)
+            {
+                itemList.Remove(ib);
+                break;
+            }
+        }
+    }
 }

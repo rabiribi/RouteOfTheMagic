@@ -71,10 +71,10 @@ namespace RouteOfTheMagic
         public int layerCount = 5;
         public Sprite sprite;
         private MagicCore magicCore;
-        MapMain instance;
+        static MapMain instance;
         MapNode currentMapNode;
 
-        public MapMain Instance
+        public static MapMain Instance
         {
             get
             {
@@ -84,7 +84,7 @@ namespace RouteOfTheMagic
                     if (instance == null)
                     {
                         // 如果没有找到， 则新建一个
-                        GameObject obj = new GameObject(this.name);
+                        GameObject obj = new GameObject("Name");
                         // 对象不可见，不会被保存
                         obj.hideFlags = HideFlags.HideAndDontSave;
                         // 强制转换为 T 

@@ -203,6 +203,8 @@ namespace RouteOfTheMagic
             isActivity = false;
             isDefence = false;
             isProtected = false;
+
+            buff = new List<BuffBasic>();
         }
 
         //节点属性
