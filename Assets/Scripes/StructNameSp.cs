@@ -120,8 +120,8 @@ namespace RouteOfTheMagic
         Pocketwatches = 3,
         Avalon = 4,
         Shadowchains = 5,
-        Fourimagearray = 6,
-        SageStone = 7,
+        Fourimagearray = 6,        
+        SageStone = 7,       
         DoubleedgedStaff = 8,
         FlameHeart = 9,
         iceHeart = 10,
@@ -129,6 +129,9 @@ namespace RouteOfTheMagic
         DeathEnd = 12,
         DeathEnd2 = 13,
         BatterStaff = 14,
+        例子=15,
+        SageStone2 = 16,
+        Fourimagearrays = 17,
         count
     }
 
@@ -330,7 +333,7 @@ namespace RouteOfTheMagic
         {
             iName = it;
             type = bt;
-            turn = -1;
+            turn = 1;
             maxCount = max;
             count = 0;
         }
@@ -355,7 +358,7 @@ namespace RouteOfTheMagic
         public List<int> magicRoute;  //释放法术时的执行路径
         public Skill skill;           //技能id
         public int target;            //法术的执行对象
-        public int Damage;            //造成的伤害
+        public int Damage;            //造成的伤害 
     };
 
     /// <summary>
