@@ -7,7 +7,7 @@ public class CharactorBuffTool {
     List<BuffBasic> buffs;
     public MagicCore magic;
     public BuffBasic doingBuff;
-
+    public ItemTool item;
     public CharactorBuffTool()
     {
         buffs = new List<BuffBasic>();
@@ -61,15 +61,25 @@ public class CharactorBuffTool {
         buff.SE += addBasic;
         buffs.Add(buff);
 
+        buff = new Buff(BuffName.无敌, 1, BuffType.sBuffDamage, -1, false);
+        buff.DE += Unstopable;
+        buffs.Add(buff);
         //示例item：名字：例子 ，执行类型：全局移动时触发，计数器个数3（如果不需要计数器，这里设置成1就行）
-        ItemBuff iBuff = new ItemBuff(ItemName.例子, BuffType.sBuffMove, 3);
+        ItemBuff iBuff = new ItemBuff(ItemName.Alchemy, BuffType.sBuffMove, 3);
         iBuff.ME += Simple;//添加事件函数，函数本体在最下边
         //添加到你的储存数组中，自己新建一个c#文件完成工具类
     }
 
+ 
+     
     public BuffBasic getBuff(BuffName bName)
     {
         return buffs[(int)bName]; 
+    }
+
+    public BuffBasic getItem(ItemName iName)
+    {
+        return buffs[(int)iName];
     }
 
     /// <summary>
@@ -219,5 +229,10 @@ public class CharactorBuffTool {
                 doingBuff.turn -= 1;
             }
         }
+    }
+
+    void Unstopable(Damage dam)
+    {
+        magic.setHP(magic.getHP() + dam.dam);
     }
 }

@@ -160,7 +160,7 @@ public class SkillTool {
         s.beforeDo += TiangleAttackB;
         skillList.Add(s);
 
-        s = new Skill(37, SkillName.奥术护盾, new List<PointColor> { PointColor.black }, new List<int> { 0 }, SkillType.singleE, SkillDoType.single, 0, 0, 0);
+        s = new Skill(37, SkillName.奥术护盾, new List<PointColor> { PointColor.black }, new List<int> { 0 }, SkillType.self, SkillDoType.single, 0, 0, 0);
         s.skillDo += MagicShelden;
         skillList.Add(s);
 
@@ -185,8 +185,14 @@ public class SkillTool {
 
     Skill getSkill(SkillName sk)
     {
-        int id = (int)sk;
-        return skillList[id];
+        foreach (Skill s in skillList)
+        {
+            if (s.name == sk)
+            {
+                return s;
+            }
+        }
+        return skillList[0];
     }
 
     /// <summary>
@@ -573,7 +579,7 @@ public class SkillTool {
     {
         List<Skill> skill = new List<Skill>();
         skill.Add(skillList[0]);
-        skill.Add(skillList[30]); //加一个魔法飞弹
+        skill.Add(skillList[37]); //加一个魔法飞弹
         return skill;
     }
 

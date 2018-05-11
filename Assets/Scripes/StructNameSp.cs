@@ -108,13 +108,30 @@ namespace RouteOfTheMagic
         ATK上升 = 9,
         风暴前夕 = 10,
         附加伤害 = 11,
-       
+        无敌 = 12,
         count
     }
 
     public enum ItemName
     {
-        例子 = 0,
+        Alchemy = 0,
+        Universalnode = 1,
+        HotGem = 2,
+        Pocketwatches = 3,
+        Avalon = 4,
+        Shadowchains = 5,
+        Fourimagearray = 6,        
+        SageStone = 7,       
+        DoubleedgedStaff = 8,
+        FlameHeart = 9,
+        iceHeart = 10,
+        ThunderHeart = 11,
+        DeathEnd = 12,
+        DeathEnd2 = 13,
+        BatterStaff = 14,
+        例子=15,
+        SageStone2 = 16,
+        Fourimagearrays = 17,
         count
     }
 
@@ -186,6 +203,8 @@ namespace RouteOfTheMagic
             isActivity = false;
             isDefence = false;
             isProtected = false;
+
+            buff = new List<BuffBasic>();
         }
 
         //节点属性
@@ -316,7 +335,7 @@ namespace RouteOfTheMagic
         {
             iName = it;
             type = bt;
-            turn = -1;
+            turn = 1;
             maxCount = max;
             count = 0;
         }
@@ -341,7 +360,7 @@ namespace RouteOfTheMagic
         public List<int> magicRoute;  //释放法术时的执行路径
         public Skill skill;           //技能id
         public int target;            //法术的执行对象
-        public int Damage;            //造成的伤害
+        public int Damage;            //造成的伤害 
     };
 
     /// <summary>
