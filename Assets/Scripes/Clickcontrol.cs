@@ -114,6 +114,7 @@ public class Clickcontrol : MonoBehaviour {
         }
         if (overCount == 0)
         {
+            overCount = -1;
             MapMain.Instance.SceneEnd(true);
             canvas.SetActive(false);
         }

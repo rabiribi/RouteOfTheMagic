@@ -51,6 +51,7 @@ namespace RouteOfTheMagic
 
             set
             {
+                button.GetComponent<Image>().color +=new Color(0.5f, 0.5f, 0.5f);
                 button.fatherIsPass = value;
                 fatherIsPass = value;
 
@@ -308,26 +309,35 @@ namespace RouteOfTheMagic
         void buttonResponse(MapNode mapNode)
         {
             currentMapNode = mapNode;
+            mapRoot.SetActive(false);
+            //Debug.Log(mapRoot);
+            foreach (var item in Root)
+            {
+                item.SetActive(false);
+                //Debug.Log(item.activeSelf);
+            }
             if (mapNode.nodeType==NodeType.fight)
             {
-                SceneManager.LoadSceneAsync("Magic");
-                mapRoot.SetActive(false);
-                foreach (var item in Root)
-                {
-                    item.SetActive(false);
-                }
+                SceneManager.LoadSceneAsync("Magic");   
             }
             else if(mapNode.nodeType == NodeType.shop)
             {
                 SceneManager.LoadSceneAsync("Shop");
-                mapRoot.SetActive(false);
-                foreach (var item in Root)
-                {
-                    item.SetActive(false);
-                }
+            }
+            else if (mapNode.nodeType == NodeType.thing)
+            {
+                SceneManager.LoadSceneAsync("Event");
             }
             Debug.Log(mapNode.nodeType);
         }
+        /// <summary>
+        /// 创建按钮
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="size"></param>
+        /// <param name="sprite"></param>
+        /// <param name="color"></param>
+        /// <returns></returns>
         ButtonEx CreatButton(Vector2 pos,Vector2 size, Sprite sprite,Color color= new Color())
         {
             GameObject go = new GameObject("node");
@@ -337,7 +347,7 @@ namespace RouteOfTheMagic
             go.AddComponent<CanvasRenderer>();
             Image img = go.AddComponent<Image>();
             //img.color = Color.white;
-            img.color = color;
+            img.color = color -new Color(0.5f,0.5f,0.5f,0);
             img.fillCenter = true;
             img.raycastTarget = true;
             img.sprite = sprite;
@@ -364,6 +374,7 @@ namespace RouteOfTheMagic
 
         void Update()
         {
+            //测试用代码
             if(Input.GetKeyDown(KeyCode.A))
             {
                 SceneEnd(true);
@@ -375,6 +386,7 @@ namespace RouteOfTheMagic
         /// <param name="istrue">战斗是否胜利</param>
         public void SceneEnd(bool istrue)
         {
+            //Debug.Log("gameOver");
             int layer = currentMapNode.layer;
             currentMapNode.button.interactable = false;
             if (istrue)
@@ -386,6 +398,7 @@ namespace RouteOfTheMagic
             {
                 item.SetActive(true);
             }
+            mapRoot.SetActive(true);
 
         }
     }
