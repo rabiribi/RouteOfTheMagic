@@ -84,7 +84,7 @@ public class Clickcontrol : MonoBehaviour {
 
         //检查线上的信息
         lineStatus();
-
+        
         //监听函数
         if (magic.getFlag()==ClickFlag.defencer)
         {
@@ -114,6 +114,7 @@ public class Clickcontrol : MonoBehaviour {
         }
         if (overCount == 0)
         {
+            overCount = -1;
             MapMain.Instance.SceneEnd(true);
             canvas.SetActive(false);
         }
@@ -366,4 +367,5 @@ public class Clickcontrol : MonoBehaviour {
         magic.itemTool.removeItem(Ibuff.iName);
         overCount--;
     }
+
 }
