@@ -61,7 +61,7 @@ public class SkillTool {
         s = new Skill(11, SkillName.混沌魔弹, new List<PointColor> {  PointColor.red, PointColor.white,  PointColor.red }, new List<int> {  1, 2, 1 }, SkillType.singleE, SkillDoType.oneWay, 5.0f, 0, 1);
         skillList.Add(s);
 
-        s = new Skill(12, SkillName.冰弹, new List<PointColor> { PointColor.blue, PointColor.white }, new List<int> { 1, 1 }, SkillType.singleE, SkillDoType.twoWay, 1.5f, 0, 1);
+        s = new Skill(12, SkillName.冰弹, new List<PointColor> { PointColor.blue, PointColor.white }, new List<int> { 1, 1 }, SkillType.singleE, SkillDoType.twoWay, 1.0f, 0, 1);
         s.skillDo += iceBall;
         skillList.Add(s);
 
@@ -201,15 +201,6 @@ public class SkillTool {
     /// <param name="magic"></param>
     void sS5(ref Magic magic)
     {
-        List<Move> mainRoute = magicCore.getRoute();
-        List<int> magicRoute = magic.magicRoute;
-        List<Point> point = magicCore.getPoint();
-        //计算防御值
-        float basic = 0;
-        for (int i = magicRoute[0]; i <= magicRoute[1]; ++i)
-        {
-            basic += point[mainRoute[i].pEnd].magic;
-        }
         //添加防御路径
         magicCore.addBuff(buffTool.getBuff(BuffName.火焰路径), -1);
     }
@@ -561,7 +552,7 @@ public class SkillTool {
         int pos = magicCore.getRoute()[m.magicRoute[0]].pEnd;
         magicCore.getPoint(pos).isProtected = false;
 
-        magicCore.doAttackToMonster(m.target, 1, magicCore.getPoint(pos).magic * 5);
+        magicCore.doAOEToMonster(1, magicCore.getPoint(pos).magic * 5);
         magicCore.getPoint(pos).magic = -1;
         magicCore.getPoint(pos).isBroken = true;
     }
