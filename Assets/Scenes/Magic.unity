@@ -693,7 +693,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fbc65f534fe74caca20b35bd99391a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  monsterHP: 10
+  monsterHP: 100
   maxMonsterHP: 100
   attackValue: 20
   attackType: 0
@@ -1043,6 +1043,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panel: {fileID: 1047453022}
   child: {fileID: 1318638903}
+  Skilltext: {fileID: 4900000, guid: 3ed040d5bcdef7b4fa8eda3daf7ba7ae, type: 3}
 --- !u!1 &316470948
 GameObject:
   m_ObjectHideFlags: 0
@@ -1240,6 +1241,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panel: {fileID: 1047453022}
   child: {fileID: 359888373}
+  Skilltext: {fileID: 0}
 --- !u!1 &332912726
 GameObject:
   m_ObjectHideFlags: 0
@@ -2844,6 +2846,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panel: {fileID: 1047453022}
   child: {fileID: 1164455662}
+  Skilltext: {fileID: 0}
 --- !u!1 &1009922775
 GameObject:
   m_ObjectHideFlags: 0
@@ -4574,6 +4577,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panel: {fileID: 1047453022}
   child: {fileID: 4126963}
+  Skilltext: {fileID: 4900000, guid: 3ed040d5bcdef7b4fa8eda3daf7ba7ae, type: 3}
 --- !u!1 &1634138081
 GameObject:
   m_ObjectHideFlags: 0

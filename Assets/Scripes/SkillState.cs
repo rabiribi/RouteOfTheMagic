@@ -10,6 +10,7 @@ public class SkillState : MonoBehaviour {
     public GameObject child;
     string[] line;
     string str;
+    public TextAsset Skilltext;
 	// Use this for initialization
 	void Start () {
 	}
@@ -21,14 +22,14 @@ public class SkillState : MonoBehaviour {
 
     public void show()
     {
-        FileStream fs = new FileStream("..\\Skill.txt", FileMode.Open, FileAccess.Read);
-        StreamReader sr = new StreamReader(fs,Encoding.Default);
-        while ((str=sr.ReadLine())!=null)
+        string[] lines = Skilltext.text.Split("\n"[0]);
+
+        for (int i = 0; i < lines.Length; ++i)
         {
-            line = str.Split(' ');
-            if (line[0] == child.GetComponent<Text>().text)
+            string[] parts = lines[i].Split(" "[0]);
+            if (parts[0] == child.GetComponent<Text>().text)
             {
-                panel.GetComponentInChildren<Text>().text = line[1];
+                panel.GetComponentInChildren<Text>().text = parts[1];
                 break;
             }
         }

@@ -109,6 +109,7 @@ namespace RouteOfTheMagic
         风暴前夕 = 10,
         附加伤害 = 11,
         无敌 = 12,
+        毒雾 = 13,
         count
     }
 

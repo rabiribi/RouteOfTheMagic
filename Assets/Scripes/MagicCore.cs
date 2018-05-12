@@ -413,16 +413,14 @@ public class MagicCore {
         }
         if (sdt == SkillDoType.single)
         {
-            //顺序找最后一个点
-            for (int i = mRoute.Count - 1; i >= 0; --i)
+            //直接找最后一个点
+            if(mRoute.Count != 0)
+            if (mPoint[mRoute[mRoute.Count -1].pEnd].color == pc[0] && !mPoint[mRoute[mRoute.Count - 1].pEnd].isBroken)
             {
-                if (mPoint[mRoute[i].pEnd].color == pc[0] && !mPoint[mRoute[i].pEnd].isBroken)
-                {
-                    subRoute.Add(i);
-                    subRoute.Add(i);
-                    subRoute.Add(0);
-                    break;
-                }
+                subRoute.Add(mRoute.Count - 1);
+                subRoute.Add(mRoute.Count - 1);
+                subRoute.Add(0);
+                
             }
         }
         if (sdt == SkillDoType.norequire)
@@ -764,7 +762,6 @@ public class MagicCore {
         skillReady.skill.beforeDo(ref skillReady);
         skillReady.skill.skillDo(ref skillReady);
         skillReady.skill.damage = 0;
-        skillReady.skill.useable = false;
         //释放技能攻击效果
         if (skillReady.Damage > 0)
         {
@@ -791,6 +788,8 @@ public class MagicCore {
             move.moveLine = -1;
             mRoute[0] = move;
         }
+        //更新技能状态
+        FreshSkillActivity();
         //刷新怪物攻击
         freshMonsterAttack();
         //清空路径
@@ -1365,38 +1364,52 @@ public class MagicCore {
         switch (buff.type)
         {
             case BuffType.pBuffBroken:
-                mPoint[pl].buff.Add(buff);
-                break;
-            case BuffType.pBuffMoveIn:
-                mPoint[pl].buff.Add(buff);
-                break;
+            case BuffType.pBuffMoveIn:  
             case BuffType.pBuffSkill:
-                mPoint[pl].buff.Add(buff);
+                {
+                    bool isHave = false;
+                    foreach (BuffBasic b in mPoint[pl].buff)
+                    {
+                        if (b.GetType() == typeof(Buff))
+                        {
+                            Buff bBuff = (Buff)b;
+                            if (bBuff.name == ((Buff)buff).name)
+                            {
+                                isHave = true;
+                                b.turn += buff.turn;
+                            }
+                        }
+                    }
+                    if(!isHave)
+                        mPoint[pl].buff.Add(buff);
+                }
                 break;
 
             case BuffType.sBuffDamage:
-                buffList.Add(buff);
-                break;
-            case BuffType.sBuffMove:
-                buffList.Add(buff);
-                break;
-            case BuffType.sBuffSkill:
-                buffList.Add(buff);
-                break;
-            case BuffType.sBuffStart:
-                buffList.Add(buff);
-                break;
-            case BuffType.sBuffTurn:
-                buffList.Add(buff);
-                break;
-            case BuffType.sBuffTurnEnd:
-                buffList.Add(buff);
-                break;
+            case BuffType.sBuffMove:              
+            case BuffType.sBuffSkill:             
+            case BuffType.sBuffStart:            
+            case BuffType.sBuffTurn:             
+            case BuffType.sBuffTurnEnd:             
             case BuffType.sBuffDefence:
-                buffList.Add(buff);
-                break;
             case BuffType.sBuffAttack:
-                buffList.Add(buff);
+                {
+                    bool isHave = false;
+                    foreach (BuffBasic b in buffList)
+                    {
+                        if (b.GetType() == typeof(Buff))
+                        {
+                            Buff bBuff = (Buff)b;
+                            if (bBuff.name == ((Buff)buff).name)
+                            {
+                                isHave = true;
+                                b.turn += buff.turn;
+                            }
+                        }
+                    }
+                    if (!isHave)
+                        buffList.Add(buff);
+                }
                 break;
         }
     }
@@ -1535,9 +1548,19 @@ public class MagicCore {
         }
     }
 
-    public void addMonsterBuff(int id, Monster.BuffType type, int count)
+    public void addMonsterBuff(int id, Monster.BuffConnection type, int count)
     {
-        mMonster[id].getAddBuffID((int)type);
+        mMonster[id].playerGiveBuff(type,count,0);
+    }
+
+    public int checkMonsterBuff(int id, Monster.BuffConnection type)
+    {
+        return mMonster[id].checkBuff(type);
+    }
+
+    public void clearMonstBuff(int id, Monster.BuffConnection type)
+    {
+        mMonster[id].checkBuff(type);
     }
 
     public void Victory()
